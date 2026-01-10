@@ -11,10 +11,10 @@ export default function Navbar() {
         </a>
         <div className="block w-auto">
           <ul className="flex flex-row space-x-15 border-0">
-            <Navbutton href={"#"} name={"Dashboard"} />
-            <Navbutton href={"#"} name={"Bookings"} />
-            <Navbutton href={"#"} name={"Rooms"} />
-            <Navbutton href={"#"} name={"Guests"} />
+            <Navbutton href={"/"} name={"Dashboard"} />
+            <Navbutton href={"/bookings"} name={"Bookings"} />
+            <Navbutton href={"/rooms"} name={"Rooms"} />
+            <Navbutton href={"/guests"} name={"Guests"} />
           </ul>
         </div>
       </div>

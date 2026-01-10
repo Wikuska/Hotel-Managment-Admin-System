@@ -3,7 +3,7 @@ import { CalendarDays, Bed, User, BookmarkX } from "lucide-react";
 
 export default function HomePage() {
   return (
-    <main className="flex flex-col min-h-screen w-full max-w-7xl mx-auto bg-amber-200">
+    <main className="flex flex-col w-full max-w-7xl mx-auto">
       <div className="my-auto bg-zinc-300 shadow-lg rounded-xl p-8 border">
         <div className="flex justify-between">
           <p className="text-4xl">Front Desk Overview</p>
