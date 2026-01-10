@@ -10,7 +10,7 @@ class RoomRead(BaseModel):
     number: str
     floor: int
     beds: int
-    is_active: bool
+    is_occupied: bool
 
     class Config:
         from_attributes = True
