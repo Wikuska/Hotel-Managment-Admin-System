@@ -10,3 +10,7 @@ export function createGuest(payload) {
     body: JSON.stringify(payload),
   });
 }
+
+export function deleteGuest(id) {
+  return api(`/guests/${id}`, { method: "DELETE" });
+}

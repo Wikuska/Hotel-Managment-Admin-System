@@ -25,3 +25,13 @@ def create_guest(data: GuestCreate, db: Session = Depends(get_db)):
 
     db.refresh(guest)
     return guest
+
+@router.delete("/{guest_id}")
+def delete_room(guest_id: int, db: Session = Depends(get_db)):
+    guest = db.query(Guest).filter(Guest.id == guest_id).first()
+    if not guest:
+        raise HTTPException(status_code=404, detail="Room not found")
+    
+    db.delete(guest)
+    db.commit()
+    return {"deleted":True}

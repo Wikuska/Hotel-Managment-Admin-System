@@ -1,5 +1,4 @@
 export default function RoomRow({ room }) {
-  console.log(room);
   return (
     <tr>
       <td className="p-3">{room.number}</td>
