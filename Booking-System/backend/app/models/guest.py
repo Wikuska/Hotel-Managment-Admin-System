@@ -8,5 +8,5 @@ class Guest(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     first_name: Mapped[str] = mapped_column(String(50), nullable=False)
     last_name: Mapped[str] = mapped_column(String(80), nullable=False)
-    email: Mapped[str | None] = mapped_column(String(120), unique=True, nullable=True)
-    phone: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    phone: Mapped[str] = mapped_column(String(30), nullable=False)
