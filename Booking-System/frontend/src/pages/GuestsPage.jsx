@@ -3,6 +3,7 @@ import { getGuests, deleteGuest, createGuest } from "../api/guests";
 import GuestRow from "../components/GuestRow";
 import ModalWrapper from "../components/ModalWrapper";
 import FetchState from "../components/FetchState";
+import Button from "../components/Button";
 
 export default function GuestsPage() {
   const [guests, setGuests] = useState([]);
@@ -39,7 +40,6 @@ export default function GuestsPage() {
     };
 
     try {
-      console.log("try");
       const createdGuest = await createGuest(newGuest);
 
       if (createdGuest) {
@@ -72,12 +72,7 @@ export default function GuestsPage() {
     <main className="flex flex-col w-full max-w-7xl mx-auto">
       <div className="flex justify-between pb-2">
         <p className="text-4xl">Guests page</p>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
-        >
-          Add new guest
-        </button>
+        <Button onClick={() => setIsModalOpen(true)} text="Add new guest" />
       </div>
       <p className="text-ml pb-7">Update and delete guests data</p>
       <div className=" bg-white shadow-lg rounded-xl border border-gray-100 p-4">
@@ -149,12 +144,7 @@ export default function GuestsPage() {
             />
           </div>
           <div className="flex w-full justify-end">
-            <button
-              type="submit"
-              className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-2 mt-5 border border-blue-700 rounded cursor-pointer"
-            >
-              Seve Guest
-            </button>
+            <Button text="Create guest" additional_style="mt-2" type="submit" />
           </div>
         </form>
       </ModalWrapper>

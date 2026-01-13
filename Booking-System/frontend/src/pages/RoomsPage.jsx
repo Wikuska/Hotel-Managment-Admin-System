@@ -1,12 +1,17 @@
 import { useState, useEffect } from "react";
-import { getRooms } from "../api/rooms";
+import { getRooms, createRoom } from "../api/rooms";
 import RoomRow from "../components/RoomRow";
 import FetchState from "../components/FetchState";
+import ModalWrapper from "../components/ModalWrapper";
+import Button from "../components/Button";
 
 export default function RoomsPage() {
   const [rooms, setRooms] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const modalInputClass = "border-zinc-300 border px-5 py-2";
 
   useEffect(() => {
     async function fetchRooms() {
@@ -23,13 +28,36 @@ export default function RoomsPage() {
     fetchRooms();
   }, []);
 
+  const handleCreateRoom = async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const formData = new FormData(event.target);
+    const newRoom = {
+      number: formData.get("room_number"),
+      floor: parseInt(formData.get("room_floor")),
+      beds: parseInt(formData.get("number_of_beds")),
+    };
+
+    try {
+      const createdRoom = await createRoom(newRoom);
+
+      if (createRoom) {
+        setRooms((prev) => [...prev, createdRoom]);
+      }
+
+      setIsModalOpen(false);
+      alert("Room created");
+    } catch (error) {
+      console.error(error);
+      alert("Server error: " + (error?.message ?? String(error)));
+    }
+  };
+
   return (
     <main className="flex flex-col w-full max-w-7xl mx-auto">
       <div className="flex justify-between pb-2">
         <p className="text-4xl">Rooms page</p>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded">
-          Create new room
-        </button>
+        <Button onClick={() => setIsModalOpen(true)} text="Create new room" />
       </div>
       <p className="text-ml pb-7">Manage status and availability</p>
       <div className=" bg-white shadow-lg rounded-xl border border-gray-100 p-4">
@@ -59,6 +87,42 @@ export default function RoomsPage() {
           </FetchState>
         </div>
       </div>
+      <ModalWrapper
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Create new room"
+      >
+        <form onSubmit={handleCreateRoom}>
+          <div className="grid grid-cols-2 grid-rows-2 gap-4">
+            <input
+              name="room_number"
+              placeholder="Room number"
+              required
+              className={modalInputClass}
+              autoComplete="off"
+            />
+            <input
+              name="room_floor"
+              type="number"
+              placeholder="Floor"
+              required
+              className={modalInputClass}
+              autoComplete="off"
+            />
+            <input
+              name="number_of_beds"
+              type="number"
+              placeholder="Beds"
+              required
+              className={modalInputClass}
+              autoComplete="off"
+            />
+          </div>
+          <div className="flex w-full justify-end">
+            <Button text="Create room" additional_style="mt-2" type="submit" />
+          </div>
+        </form>
+      </ModalWrapper>
     </main>
   );
 }
