@@ -11,6 +11,13 @@ export function createGuest(payload) {
   });
 }
 
+export function updateGuest(id, payload) {
+  return api(`/guests/update/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
 export function deleteGuest(id) {
-  return api(`/guests/${id}`, { method: "DELETE" });
+  return api(`/guests/delete/${id}`, { method: "DELETE" });
 }

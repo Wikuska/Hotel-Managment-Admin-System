@@ -1,6 +1,6 @@
 import { NotebookPen, Trash2 } from "lucide-react";
 
-export default function GuestRow({ guest, onDelete }) {
+export default function GuestRow({ guest, onDelete, onEdit }) {
   return (
     <tr>
       <td className="p-3">
@@ -9,13 +9,10 @@ export default function GuestRow({ guest, onDelete }) {
       <td className="text-left">{guest.email}</td>
       <td className="text-left">{guest.phone}</td>
       <td>
-        <button className="mr-3 cursor-pointer">
+        <button onClick={onEdit} className="mr-3 cursor-pointer">
           <NotebookPen />
         </button>
-        <button
-          className="ml-3 cursor-pointer"
-          onClick={() => onDelete(guest.id)}
-        >
+        <button onClick={onDelete} className="ml-3 cursor-pointer">
           <Trash2 />
         </button>
       </td>

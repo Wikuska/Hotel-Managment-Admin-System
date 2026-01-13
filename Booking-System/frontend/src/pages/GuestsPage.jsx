@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { getGuests, deleteGuest, createGuest } from "../api/guests";
+import {
+  getGuests,
+  deleteGuest,
+  createGuest,
+  updateGuest,
+} from "../api/guests";
 import GuestRow from "../components/GuestRow";
 import ModalWrapper from "../components/ModalWrapper";
 import FetchState from "../components/FetchState";
@@ -10,6 +15,7 @@ export default function GuestsPage() {
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedGuest, setSelectedGuest] = useState(null);
 
   const modalInputClass = "border-zinc-300 border px-5 py-2";
 
@@ -28,11 +34,21 @@ export default function GuestsPage() {
     fetchGuests();
   }, []);
 
-  const handleAddGuest = async (event) => {
+  const handleOpenCreate = () => {
+    setSelectedGuest(null);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (guest) => {
+    setSelectedGuest(guest);
+    setIsModalOpen(true);
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     event.stopPropagation();
     const formData = new FormData(event.target);
-    const newGuest = {
+    const guestData = {
       first_name: formData.get("first_name"),
       last_name: formData.get("last_name"),
       email: formData.get("email"),
@@ -40,17 +56,27 @@ export default function GuestsPage() {
     };
 
     try {
-      const createdGuest = await createGuest(newGuest);
+      if (selectedGuest) {
+        const updatedGuest = await updateGuest(selectedGuest.id, guestData);
 
-      if (createdGuest) {
-        setGuests((prev) => [...prev, createdGuest]);
+        setGuests((prevGuestes) =>
+          prevGuestes.map((guest) =>
+            guest.id === selectedGuest.id ? updatedGuest : guest
+          )
+        );
+      } else {
+        const createdGuest = await createGuest(guestData);
+
+        if (createdGuest) {
+          setGuests((prev) => [...prev, createdGuest]);
+        }
+        alert("Guest created");
       }
 
       setIsModalOpen(false);
-      alert("Guest created");
     } catch (error) {
       console.error(error);
-      alert("Server error: " + (error?.message ?? String(error)));
+      alert("Operation failed: " + (error?.message ?? String(error)));
     }
   };
 
@@ -72,7 +98,12 @@ export default function GuestsPage() {
     <main className="flex flex-col w-full max-w-7xl mx-auto">
       <div className="flex justify-between pb-2">
         <p className="text-4xl">Guests page</p>
-        <Button onClick={() => setIsModalOpen(true)} text="Add new guest" />
+        <Button
+          onClick={() => {
+            handleOpenCreate();
+          }}
+          text="Add new guest"
+        />
       </div>
       <p className="text-ml pb-7">Update and delete guests data</p>
       <div className=" bg-white shadow-lg rounded-xl border border-gray-100 p-4">
@@ -97,7 +128,12 @@ export default function GuestsPage() {
                   <GuestRow
                     key={guest.id}
                     guest={guest}
-                    onDelete={handleRemoveGuest}
+                    onDelete={() => {
+                      handleRemoveGuest(guest.id);
+                    }}
+                    onEdit={() => {
+                      handleOpenEdit(guest);
+                    }}
                   />
                 ))}
               </tbody>
@@ -108,13 +144,14 @@ export default function GuestsPage() {
       <ModalWrapper
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Add new guest"
+        title={selectedGuest ? "Edit guest informations" : "Add new guest"}
       >
-        <form onSubmit={handleAddGuest}>
+        <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-2 grid-rows-2 gap-4">
             <input
               name="first_name"
               placeholder="First Name"
+              defaultValue={selectedGuest ? selectedGuest.first_name : ""}
               required
               className={modalInputClass}
               autoComplete="off"
@@ -122,6 +159,7 @@ export default function GuestsPage() {
             <input
               name="last_name"
               placeholder="Last Name"
+              defaultValue={selectedGuest ? selectedGuest.last_name : ""}
               required
               className={modalInputClass}
               autoComplete="off"
@@ -130,6 +168,7 @@ export default function GuestsPage() {
               name="email"
               type="email"
               placeholder="Email Address"
+              defaultValue={selectedGuest ? selectedGuest.email : ""}
               required
               className={modalInputClass}
               autoComplete="off"
@@ -138,13 +177,18 @@ export default function GuestsPage() {
               name="phone"
               type="tel"
               placeholder="Phone Number"
+              defaultValue={selectedGuest ? selectedGuest.phone : ""}
               required
               className={modalInputClass}
               autoComplete="off"
             />
           </div>
           <div className="flex w-full justify-end">
-            <Button text="Create guest" additional_style="mt-2" type="submit" />
+            <Button
+              text={selectedGuest ? "Update guest" : "Create guest"}
+              additional_style="mt-2"
+              type="submit"
+            />
           </div>
         </form>
       </ModalWrapper>

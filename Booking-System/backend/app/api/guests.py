@@ -34,14 +34,33 @@ def create_guest(data: GuestCreate, db: Session = Depends(get_db)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Something went wrong: {str(e)}"
         )
-
-    
-
-@router.delete("/{guest_id}")
-def delete_room(guest_id: int, db: Session = Depends(get_db)):
+        
+@router.put("/update/{guest_id}", response_model=GuestRead)
+def update_guest(guest_id: int, data: GuestCreate, db: Session = Depends(get_db)):
     guest = db.query(Guest).filter(Guest.id == guest_id).first()
     if not guest:
-        raise HTTPException(status_code=404, detail="Room not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Guest not found")
+    update_data = data.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(guest, key, value)
+        
+    try:
+        db.commit()
+        db.refresh(guest)
+        return guest
+        
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email already exists assigned to another guest."
+        )
+
+@router.delete("/delete/{guest_id}")
+def delete_guest(guest_id: int, db: Session = Depends(get_db)):
+    guest = db.query(Guest).filter(Guest.id == guest_id).first()
+    if not guest:
+        raise HTTPException(status_code=404, detail="Guest not found")
     
     db.delete(guest)
     db.commit()
