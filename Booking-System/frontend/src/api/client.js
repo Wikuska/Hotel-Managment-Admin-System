@@ -10,14 +10,11 @@ export async function api(path, options = {}) {
   });
 
   if (!res.ok) {
-    let message = `HTTP ${res.status}`;
-    try {
-      const data = await res.json();
-      message = data?.detail || message;
-    } catch {}
-    throw new Error(message);
+    const error = await res.json().catch(() => null);
+    throw new Error(error?.detail || `HTTP ${res.status}`);
   }
 
-  const text = await res.text();
-  return text ? JSON.parse(text) : null;
+  if (res.status === 204) return null;
+
+  return await res.json();
 }

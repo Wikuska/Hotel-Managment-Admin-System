@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -19,12 +20,22 @@ def create_guest(data: GuestCreate, db: Session = Depends(get_db)):
 
     try:
         db.commit()
-    except Exception:
+        db.refresh(guest)
+        return guest
+    except IntegrityError as e:
         db.rollback()
-        raise HTTPException(status_code=400, detail="Email must be unique (or invalid data)")
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Guest with this email already exists."
+        )
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Something went wrong: {str(e)}"
+        )
 
-    db.refresh(guest)
-    return guest
+    
 
 @router.delete("/{guest_id}")
 def delete_room(guest_id: int, db: Session = Depends(get_db)):
