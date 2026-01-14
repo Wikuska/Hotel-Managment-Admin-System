@@ -1,7 +1,6 @@
 export const sortEntities = (data, key, direction = "asc") => {
   if (!data) return [];
 
-  console.log(data);
   return [...data].sort((a, b) => {
     const valA = (a[key] || "").toString();
     const valB = (b[key] || "").toString();

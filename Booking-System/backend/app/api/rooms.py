@@ -14,7 +14,7 @@ def get_rooms(db: Session = Depends(get_db)):
 
 @router.post("", response_model=RoomRead)
 def create_room(data: RoomCreate, db: Session = Depends(get_db)):
-    room = Room(**data.model_dump(), is_occupied=False)
+    room = Room(**data.model_dump())
     db.add(room)
 
     try:

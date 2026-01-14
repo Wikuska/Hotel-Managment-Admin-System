@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getRooms, createRoom } from "../api/rooms";
-import { sortEntities } from "../utils/dtatUtils";
+import { sortEntities } from "../utils/dataUtils";
+import { ROOM_STATUSES } from "../utils/constants";
 import RoomRow from "../components/RoomRow";
 import FetchState from "../components/FetchState";
 import ModalWrapper from "../components/ModalWrapper";
@@ -39,6 +40,7 @@ export default function RoomsPage() {
       number: formData.get("room_number"),
       floor: parseInt(formData.get("room_floor")),
       beds: parseInt(formData.get("number_of_beds")),
+      room_status: formData.get("room_status").toLowerCase(),
     };
 
     try {
@@ -87,10 +89,10 @@ export default function RoomsPage() {
                       </span>
                     </div>
                   </th>
-                  <th className="text-left w-2/9">Floor</th>
-                  <th className="text-left w-2/9">Beds</th>
-                  <th className="text-left w-2/9">Status</th>
-                  <th className="text-left w-1/9"></th>
+                  <th className="text-left w-1/5">Floor</th>
+                  <th className="text-left w-1/5">Beds</th>
+                  <th className="text-left w-1/5">Status</th>
+                  <th className="text-left w-1/5"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-300">
@@ -132,6 +134,13 @@ export default function RoomsPage() {
               className={modalInputClass}
               autoComplete="off"
             />
+            <select name="room_status" className={modalInputClass}>
+              {ROOM_STATUSES.map((status) => (
+                <option key={status.value} value={status.value}>
+                  {status.label}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="flex w-full justify-end">
             <Button text="Create room" additional_style="mt-2" type="submit" />

@@ -5,7 +5,7 @@ import {
   createGuest,
   updateGuest,
 } from "../api/guests";
-import { filterEntities } from "../utils/dtatUtils";
+import { filterEntities } from "../utils/dataUtils";
 import GuestRow from "../components/GuestRow";
 import ModalWrapper from "../components/ModalWrapper";
 import FetchState from "../components/FetchState";

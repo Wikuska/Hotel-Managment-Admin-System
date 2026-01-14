@@ -9,4 +9,4 @@ class Room(Base):
     number: Mapped[str] = mapped_column(String(10), unique=True, nullable=False)
     floor: Mapped[int] = mapped_column(Integer, nullable=False)
     beds: Mapped[int] = mapped_column(Integer, nullable=False)
-    is_occupied: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    room_status: Mapped[bool] = mapped_column(String, nullable=False, default="available")
