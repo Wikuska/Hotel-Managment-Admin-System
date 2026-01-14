@@ -4,7 +4,7 @@ export default function GuestRow({ guest, onDelete, onEdit }) {
   return (
     <tr>
       <td className="p-3">
-        {guest.first_name} {guest.last_name}
+        {guest.last_name} {guest.first_name}
       </td>
       <td className="text-left">{guest.email}</td>
       <td className="text-left">{guest.phone}</td>

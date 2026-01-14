@@ -5,6 +5,7 @@ import {
   createGuest,
   updateGuest,
 } from "../api/guests";
+import { filterEntities } from "../utils/dtatUtils";
 import GuestRow from "../components/GuestRow";
 import ModalWrapper from "../components/ModalWrapper";
 import FetchState from "../components/FetchState";
@@ -16,8 +17,13 @@ export default function GuestsPage() {
   const [error, setError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedGuest, setSelectedGuest] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const modalInputClass = "border-zinc-300 border px-5 py-2";
+
+  const filteredGuests = filterEntities(guests, searchQuery, (guest) => {
+    return `${guest.first_name} ${guest.last_name}`;
+  });
 
   useEffect(() => {
     async function fetchGuests() {
@@ -107,6 +113,15 @@ export default function GuestsPage() {
       </div>
       <p className="text-ml pb-7">Update and delete guests data</p>
       <div className=" bg-white shadow-lg rounded-xl border border-gray-100 p-4">
+        <input
+          type="text"
+          placeholder="Find guest (name/last name)"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full border-zinc-200 border-2 rounded-xl p-1.5"
+        />
+      </div>
+      <div className=" bg-white shadow-lg rounded-xl border border-gray-100 p-4">
         <div className="border-zinc-200 border-2 rounded-xl overflow-y-auto h-[50vh]">
           <FetchState
             isLoading={isFetching}
@@ -124,7 +139,7 @@ export default function GuestsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-300">
-                {guests.map((guest) => (
+                {filteredGuests.map((guest) => (
                   <GuestRow
                     key={guest.id}
                     guest={guest}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getRooms, createRoom } from "../api/rooms";
+import { sortEntities } from "../utils/dtatUtils";
 import RoomRow from "../components/RoomRow";
 import FetchState from "../components/FetchState";
 import ModalWrapper from "../components/ModalWrapper";
@@ -10,8 +11,10 @@ export default function RoomsPage() {
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sortOrder, setSortOrder] = useState("asc");
 
   const modalInputClass = "border-zinc-300 border px-5 py-2";
+  const sortedRooms = sortEntities(rooms, "number", sortOrder);
 
   useEffect(() => {
     async function fetchRooms() {
@@ -71,7 +74,19 @@ export default function RoomsPage() {
             <table className=" w-full ">
               <thead className="bg-zinc-200 sticky top-0">
                 <tr>
-                  <th className="p-3 text-left w-2/9">Room number</th>
+                  <th
+                    className="p-3 text-left w-2/9"
+                    onClick={() =>
+                      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"))
+                    }
+                  >
+                    <div>
+                      Room number
+                      <span className="ml-2 cursor-pointer">
+                        {sortOrder === "asc" ? "⬆️" : "⬇️"}
+                      </span>
+                    </div>
+                  </th>
                   <th className="text-left w-2/9">Floor</th>
                   <th className="text-left w-2/9">Beds</th>
                   <th className="text-left w-2/9">Status</th>
@@ -79,7 +94,7 @@ export default function RoomsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-300">
-                {rooms.map((room) => (
+                {sortedRooms.map((room) => (
                   <RoomRow key={room.id} room={room} />
                 ))}
               </tbody>
