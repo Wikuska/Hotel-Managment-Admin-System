@@ -1,7 +1,35 @@
+import { useEffect, useState } from "react";
 import StatCard from "../components/StatCard";
 import { CalendarDays, Bed, User, BookmarkX } from "lucide-react";
+import { getDashboardStats } from "../api/dashboard";
+import { Loader2 } from "lucide-react";
 
 export default function HomePage() {
+  const [stats, setStats] = useState({
+    arrivals_today: 0,
+    departures_today: 0,
+    available_rooms: 0,
+    guests_in_house: 0,
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchDashboardStats() {
+      try {
+        const data = await getDashboardStats();
+        setStats(data);
+      } catch (error) {
+        alert({
+          message: error.message || "Failed to fetch guests dashboard data",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchDashboardStats();
+  }, []);
+
   return (
     <main className="flex flex-col w-full max-w-7xl mx-auto">
       <div className="my-auto bg-zinc-300 shadow-lg rounded-xl p-8 border">
@@ -14,19 +42,51 @@ export default function HomePage() {
         <div className="grid grid-cols-4 gap-10 w-full p-10">
           <StatCard
             Icon={CalendarDays}
-            number={14}
+            number={
+              isLoading ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                stats.arrivals_today
+              )
+            }
             description="Arrivals Today"
           />
 
           <StatCard
             Icon={BookmarkX}
-            number={9}
+            number={
+              isLoading ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                stats.departures_today
+              )
+            }
             description="Departures Today"
           />
 
-          <StatCard Icon={Bed} number={32} description="Available Rooms" />
+          <StatCard
+            Icon={Bed}
+            number={
+              isLoading ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                stats.available_rooms
+              )
+            }
+            description="Available Rooms"
+          />
 
-          <StatCard Icon={User} number={115} description="Guests In-House" />
+          <StatCard
+            Icon={User}
+            number={
+              isLoading ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                stats.guests_in_house
+              )
+            }
+            description="Guests In-House"
+          />
         </div>
       </div>
     </main>
