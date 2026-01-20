@@ -21,3 +21,12 @@ export const filterEntities = (data, query, getSearchtableText) => {
     return textToCheck.includes(lowerQuery);
   });
 };
+
+export const filterByAllowedValues = (data, key, allowedValues) => {
+  if (!data || !allowedValues) return data;
+
+  return data.filter((item) => {
+    const itemValue = item[key];
+    return allowedValues.includes(itemValue);
+  });
+};

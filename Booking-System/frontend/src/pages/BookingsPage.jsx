@@ -3,11 +3,19 @@ import BookingRow from "../components/BookingRow";
 import { getBookings } from "../api/bookings";
 import Button from "../components/Button";
 import FetchState from "../components/FetchState";
+import { filterByAllowedValues } from "../utils/dataUtils";
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState(false);
+  const [activeTab, setActiveTab] = useState("active");
+
+  const TAB_STATUSES = {
+    active: ["confirmed", "checked in"],
+    archived: ["checked out", "cancelled", "no show"],
+    all: null,
+  };
 
   useEffect(() => {
     async function fetchBookings() {
@@ -24,6 +32,10 @@ export default function BookingsPage() {
     fetchBookings();
   }, []);
 
+  const bookingsInTab = TAB_STATUSES[activeTab]
+    ? filterByAllowedValues(bookings, "status", TAB_STATUSES[activeTab])
+    : bookings;
+
   return (
     <main className="flex flex-col w-full max-w-7xl mx-auto">
       <div className="flex justify-between pb-2">
@@ -31,6 +43,26 @@ export default function BookingsPage() {
         <Button text="Create new reservation" />
       </div>
       <p className="text-ml pb-7">Manage guest reservations and check-ins</p>
+      <div className="ml-3">
+        {["active", "archived", "all"].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`
+        pb-3 px-4 text-sm font-medium transition-colors relative
+        ${
+          activeTab === tab
+            ? "text-blue-600 border-b-2 border-blue-600"
+            : "text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 border-transparent"
+        }
+      `}
+          >
+            {tab === "active" && "Active"}
+            {tab === "archived" && "Archived"}
+            {tab === "all" && "All"}
+          </button>
+        ))}
+      </div>
       <div className=" bg-white shadow-lg rounded-xl border border-gray-100 p-4">
         <div className="border-zinc-200 border-2 rounded-xl overflow-y-auto h-[50vh]">
           <FetchState isLoading={isFetching} error={error} data={bookings}>
@@ -45,7 +77,7 @@ export default function BookingsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-300">
-                {bookings.map((booking) => (
+                {bookingsInTab.map((booking) => (
                   <BookingRow key={booking.id} booking={booking} />
                 ))}
               </tbody>
