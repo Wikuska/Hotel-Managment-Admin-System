@@ -6,7 +6,7 @@ class RoomStatusEnum(str, enum.Enum):
     OCCUPIED = "occupied"
     DIRTY = "dirty"
     CLEANING = "cleaning"
-    MAINTANCE = "maintance"
+    MAINTENANCE = "maintenance"
 
 class RoomCreate(BaseModel):
     number: str
