@@ -9,7 +9,9 @@ export default function RoomRow({ room }) {
       <td className="p-3">{room.number}</td>
       <td className="text-left">{room.floor}</td>
       <td className="text-left">{room.beds}</td>
-      <td className={statusConfig.color}>{statusConfig.label}</td>
+      <td>
+        <span className={statusConfig.color}>{statusConfig.label}</span>
+      </td>
       <td>
         <button className="align-middle mr-3">
           <NotebookPen />
