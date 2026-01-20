@@ -3,12 +3,27 @@ from pydantic import BaseModel
 import enum
 
 class BookingStatusEnum(str, enum.Enum):
-    CONFIRMED = "confirmed",
-    CHECKED_IN = "checked in",
-    CHECKED_OUT = "checked out",
+    CONFIRMED = "confirmed"
+    CHECKED_IN = "checked in"
+    CHECKED_OUT = "checked out"
     CANCELLED = "cancelled"
     NO_SHOW = "no show"
 
+class RoomSummary(BaseModel):
+    id: int
+    number: str
+    
+    class Config:
+        from_attributes = True
+
+class GuestSummary(BaseModel):
+    id: int
+    first_name: str
+    last_name: str
+    email: str
+    
+    class Config:
+        from_attributes = True
 
 class BookingCreate(BaseModel):
     room_id: int
@@ -24,6 +39,8 @@ class BookingRead(BaseModel):
     date_to: date
     status: BookingStatusEnum
     created_at: datetime
+    room: RoomSummary
+    guest: GuestSummary
 
     class Config:
         from_attributes = True
