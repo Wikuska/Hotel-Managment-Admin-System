@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -26,7 +26,20 @@ def create_room(data: RoomCreate, db: Session = Depends(get_db)):
     db.refresh(room)
     return room
 
-@router.delete("/{room_id}")
+@router.put("/update/{room_id}", response_model=RoomRead)
+def update_room(room_id: int, data: RoomCreate, db: Session = Depends(get_db)):
+    room = db.query(Room).filter(Room.id == room_id).first()
+    if not room:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Guest not found")
+    update_data = data.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(room, key, value)
+        
+    db.commit()
+    db.refresh(room)
+    return room
+
+@router.delete("/delete/{room_id}")
 def delete_room(room_id: int, db: Session = Depends(get_db)):
     room = db.query(Room).filter(Room.id == room_id).first()
     if not room:
