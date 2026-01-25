@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import { getRooms, createRoom, updateRoom } from "../api/rooms";
 import { sortEntities } from "../utils/dataUtils";
-import { ROOM_STATUSES } from "../utils/constants";
 import RoomRow from "../components/RoomRow";
+import RoomModal from "../components/RoomModal";
 import FetchState from "../components/FetchState";
-import ModalWrapper from "../components/ModalWrapper";
 import Button from "../components/Button";
 
 export default function RoomsPage() {
@@ -15,7 +14,6 @@ export default function RoomsPage() {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
 
-  const modalInputClass = "border-zinc-300 border px-5 py-2";
   const sortedRooms = sortEntities(rooms, "number", sortOrder);
 
   useEffect(() => {
@@ -43,28 +41,18 @@ export default function RoomsPage() {
     setIsModalOpen(true);
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    const formData = new FormData(event.target);
-    const roomData = {
-      number: formData.get("room_number"),
-      floor: formData.get("room_floor"),
-      beds: formData.get("number_of_beds"),
-      room_status: formData.get("room_status"),
-    };
-
+  const handleSave = async (data) => {
     try {
       if (selectedRoom) {
-        const updatedRoom = await updateRoom(selectedRoom.id, roomData);
+        const updatedRoom = await updateRoom(selectedRoom.id, data);
 
         setRooms((prevRooms) =>
           prevRooms.map((room) =>
-            room.id === updatedRoom.id ? updatedRoom : room
-          )
+            room.id === updatedRoom.id ? updatedRoom : room,
+          ),
         );
       } else {
-        const createdRoom = await createRoom(roomData);
+        const createdRoom = await createRoom(data);
 
         if (createdRoom) {
           setRooms((prev) => [...prev, createdRoom]);
@@ -116,7 +104,7 @@ export default function RoomsPage() {
                     </div>
                   </th>
                   <th className="text-left w-1/5">Floor</th>
-                  <th className="text-left w-1/5">Beds</th>
+                  <th className="text-left w-1/5">Room type</th>
                   <th className="text-left w-1/5">Status</th>
                   <th className="text-left w-1/5"></th>
                 </tr>
@@ -136,64 +124,12 @@ export default function RoomsPage() {
           </FetchState>
         </div>
       </div>
-      <ModalWrapper
+      <RoomModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={selectedRoom ? "Update room information" : "Create new room"}
-      >
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-2 grid-rows-2 gap-4">
-            <input
-              name="room_number"
-              placeholder="Room number"
-              required
-              defaultValue={selectedRoom ? selectedRoom.number : ""}
-              readOnly={selectedRoom ? true : false}
-              className={modalInputClass}
-              autoComplete="off"
-            />
-            <input
-              name="room_floor"
-              type="number"
-              placeholder="Floor"
-              required
-              defaultValue={selectedRoom ? selectedRoom.floor : ""}
-              readOnly={selectedRoom ? true : false}
-              className={modalInputClass}
-              autoComplete="off"
-            />
-            <input
-              name="number_of_beds"
-              type="number"
-              placeholder="Beds"
-              required
-              defaultValue={selectedRoom ? selectedRoom.beds : ""}
-              className={modalInputClass}
-              autoComplete="off"
-            />
-            <select
-              name="room_status"
-              className={modalInputClass}
-              defaultValue={
-                selectedRoom ? selectedRoom.room_status : "available"
-              }
-            >
-              {ROOM_STATUSES.map((status) => (
-                <option key={status.value} value={status.value}>
-                  {status.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex w-full justify-end">
-            <Button
-              text={selectedRoom ? "Update" : "Create room"}
-              additional_style="mt-2"
-              type="submit"
-            />
-          </div>
-        </form>
-      </ModalWrapper>
+        onSubmit={handleSave}
+        initialData={selectedRoom}
+      />
     </main>
   );
 }
