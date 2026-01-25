@@ -1,3 +1,40 @@
+export const MODAL_INPUT_CLASS = "border-zinc-300 border px-5 py-2 w-full";
+
+export const ROOM_TYPES = [
+  {
+    value: "single",
+    desc: "1 Single",
+  },
+  {
+    value: "double",
+    desc: "1 Double",
+  },
+  {
+    value: "twin",
+    desc: "2 Single",
+  },
+  {
+    value: "triple_1d1s",
+    desc: "1 Double + 1 Single",
+  },
+  {
+    value: "triple_3s",
+    desc: "3 Single",
+  },
+  {
+    value: "quad_2d",
+    desc: "2 Double",
+  },
+  {
+    value: "quad_1d2s",
+    desc: "1 Double + 2 Single",
+  },
+  {
+    value: "quad_4s",
+    desc: "4 Single",
+  },
+];
+
 export const ROOM_STATUSES = [
   {
     value: "available",
