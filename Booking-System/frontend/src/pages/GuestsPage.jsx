@@ -7,7 +7,7 @@ import {
 } from "../api/guests";
 import { filterEntities } from "../utils/dataUtils";
 import GuestRow from "../components/GuestRow";
-import ModalWrapper from "../components/ModalWrapper";
+import GuestModal from "../components/GuestModal";
 import FetchState from "../components/FetchState";
 import Button from "../components/Button";
 
@@ -18,8 +18,6 @@ export default function GuestsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedGuest, setSelectedGuest] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-
-  const modalInputClass = "border-zinc-300 border px-5 py-2";
 
   const filteredGuests = filterEntities(guests, searchQuery, (guest) => {
     return `${guest.first_name} ${guest.last_name}`;
@@ -50,28 +48,18 @@ export default function GuestsPage() {
     setIsModalOpen(true);
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    const formData = new FormData(event.target);
-    const guestData = {
-      first_name: formData.get("first_name"),
-      last_name: formData.get("last_name"),
-      email: formData.get("email"),
-      phone: formData.get("phone"),
-    };
-
+  const handleSave = async (data) => {
     try {
       if (selectedGuest) {
-        const updatedGuest = await updateGuest(selectedGuest.id, guestData);
+        const updatedGuest = await updateGuest(selectedGuest.id, data);
 
         setGuests((prevGuestes) =>
           prevGuestes.map((guest) =>
-            guest.id === selectedGuest.id ? updatedGuest : guest
-          )
+            guest.id === selectedGuest.id ? updatedGuest : guest,
+          ),
         );
       } else {
-        const createdGuest = await createGuest(guestData);
+        const createdGuest = await createGuest(data);
 
         if (createdGuest) {
           setGuests((prev) => [...prev, createdGuest]);
@@ -92,7 +80,7 @@ export default function GuestsPage() {
     try {
       await deleteGuest(id);
       setGuests((currentGuests) =>
-        currentGuests.filter((guest) => guest.id != id)
+        currentGuests.filter((guest) => guest.id != id),
       );
     } catch (error) {
       console.error("Error occured:", error);
@@ -156,57 +144,12 @@ export default function GuestsPage() {
           </FetchState>
         </div>
       </div>
-      <ModalWrapper
+      <GuestModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={selectedGuest ? "Edit guest informations" : "Add new guest"}
-      >
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-2 grid-rows-2 gap-4">
-            <input
-              name="first_name"
-              placeholder="First Name"
-              defaultValue={selectedGuest ? selectedGuest.first_name : ""}
-              required
-              className={modalInputClass}
-              autoComplete="off"
-            />
-            <input
-              name="last_name"
-              placeholder="Last Name"
-              defaultValue={selectedGuest ? selectedGuest.last_name : ""}
-              required
-              className={modalInputClass}
-              autoComplete="off"
-            />
-            <input
-              name="email"
-              type="email"
-              placeholder="Email Address"
-              defaultValue={selectedGuest ? selectedGuest.email : ""}
-              required
-              className={modalInputClass}
-              autoComplete="off"
-            />
-            <input
-              name="phone"
-              type="tel"
-              placeholder="Phone Number"
-              defaultValue={selectedGuest ? selectedGuest.phone : ""}
-              required
-              className={modalInputClass}
-              autoComplete="off"
-            />
-          </div>
-          <div className="flex w-full justify-end">
-            <Button
-              text={selectedGuest ? "Update guest" : "Create guest"}
-              additional_style="mt-2"
-              type="submit"
-            />
-          </div>
-        </form>
-      </ModalWrapper>
+        onSubmit={handleSave}
+        initialData={selectedGuest}
+      />
     </main>
   );
 }
