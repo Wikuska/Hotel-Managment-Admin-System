@@ -8,5 +8,6 @@ class Room(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     number: Mapped[str] = mapped_column(String(10), unique=True, nullable=False)
     floor: Mapped[int] = mapped_column(Integer, nullable=False)
-    beds: Mapped[int] = mapped_column(Integer, nullable=False)
-    room_status: Mapped[bool] = mapped_column(String, nullable=False, default="available")
+    capacity: Mapped[int] = mapped_column(Integer, nullable = False)
+    room_type: Mapped[str] = mapped_column(String, nullable=False)
+    room_status: Mapped[str] = mapped_column(String, nullable=False, default="available")
