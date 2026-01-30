@@ -1,4 +1,5 @@
-export const MODAL_INPUT_CLASS = "border-zinc-300 border px-5 py-2 w-full";
+export const MODAL_INPUT_CLASS = "border-zinc-300 border px-5 py-2 w-full h-11";
+export const MODAL_LABEL_CLASS = "text-sm font-medium text-gray-700";
 
 export const ROOM_TYPES = [
   {

@@ -1,5 +1,6 @@
 import ModalWrapper from "./ModalWrapper";
 import Button from "./Button";
+import ModalInput from "./ModalInput";
 import { MODAL_INPUT_CLASS } from "../utils/constants";
 
 export default function GuestModal({ isOpen, onClose, onSubmit, initialData }) {
@@ -28,72 +29,36 @@ export default function GuestModal({ isOpen, onClose, onSubmit, initialData }) {
     >
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-2 grid-rows-2 gap-4">
-          <div>
-            <label
-              htmlFor="first_name"
-              className="text-sm font-medium text-gray-700"
-            >
-              First Name
-            </label>
-            <input
-              name="first_name"
-              placeholder="First Name"
-              defaultValue={isEditMode ? initialData.first_name : ""}
-              required
-              className={MODAL_INPUT_CLASS}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="last_name"
-              className="text-sm font-medium text-gray-700"
-            >
-              Last Name
-            </label>
-            <input
-              name="last_name"
-              placeholder="Last Name"
-              defaultValue={isEditMode ? initialData.last_name : ""}
-              required
-              className={MODAL_INPUT_CLASS}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="email"
-              className="text-sm font-medium text-gray-700"
-            >
-              Email Address
-            </label>
-            <input
-              name="email"
-              type="email"
-              placeholder="Email Address"
-              defaultValue={isEditMode ? initialData.email : ""}
-              required
-              className={MODAL_INPUT_CLASS}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="phone"
-              className="text-sm font-medium text-gray-700"
-            >
-              Phone Number
-            </label>
-            <input
-              name="phone"
-              type="tel"
-              placeholder="Phone Number"
-              defaultValue={isEditMode ? initialData.phone : ""}
-              required
-              className={MODAL_INPUT_CLASS}
-              autoComplete="off"
-            />
-          </div>
+          <ModalInput
+            label="First Name"
+            input_name="first_name"
+            defaultValue={isEditMode ? initialData.first_name : ""}
+            required
+            autoComplete="off"
+          />
+          <ModalInput
+            label="Last Name"
+            input_name="last_name"
+            defaultValue={isEditMode ? initialData.last_name : ""}
+            required
+            autoComplete="off"
+          />
+          <ModalInput
+            label="Email Address"
+            input_name="email"
+            input_type="emial"
+            defaultValue={isEditMode ? initialData.email : ""}
+            required
+            autoComplete="off"
+          />
+          <ModalInput
+            label="Phone Number"
+            input_name="phone"
+            input_type="tel"
+            defaultValue={isEditMode ? initialData.phone : ""}
+            required
+            autoComplete="off"
+          />
         </div>
         <div className="flex w-full justify-end">
           <Button

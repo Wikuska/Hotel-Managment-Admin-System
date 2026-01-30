@@ -1,5 +1,6 @@
 import ModalWrapper from "./ModalWrapper";
 import Button from "./Button";
+import ModalInput from "./ModalInput";
 import {
   ROOM_TYPES,
   MODAL_INPUT_CLASS,
@@ -33,58 +34,33 @@ export default function RoomModal({ isOpen, onClose, onSubmit, initialData }) {
     >
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-3 gap-4">
-          <div>
-            <label
-              htmlFor="room_number"
-              className="text-sm font-medium text-gray-700"
-            >
-              Room Number
-            </label>
-            <input
-              name="room_number"
-              placeholder="Room number"
-              required
-              defaultValue={isEditMode ? initialData.number : ""}
-              readOnly={isEditMode ? true : false}
-              className={MODAL_INPUT_CLASS}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="room_floor"
-              className="text-sm font-medium text-gray-700 bg"
-            >
-              Floor Number
-            </label>
-            <input
-              name="room_floor"
-              type="number"
-              placeholder="Floor"
-              required
-              defaultValue={isEditMode ? initialData.floor : ""}
-              readOnly={isEditMode ? true : false}
-              className={MODAL_INPUT_CLASS}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="capacity"
-              className="text-sm font-medium text-gray-700"
-            >
-              Room Capacity
-            </label>
-            <input
-              name="capacity"
-              type="number"
-              placeholder="Capacity"
-              required
-              defaultValue={isEditMode ? initialData.capacity : ""}
-              className={MODAL_INPUT_CLASS}
-              autoComplete="off"
-            />
-          </div>
+          <ModalInput
+            label="Room number"
+            input_name="room_number"
+            autoComplete="off"
+            required
+            defaultValue={isEditMode ? initialData.number : ""}
+            readOnly={isEditMode ? true : false}
+          />
+          <ModalInput
+            label="Floor Number"
+            input_name="room_floor"
+            input_type="number"
+            required
+            defaultValue={isEditMode ? initialData.floor : ""}
+            readOnly={isEditMode ? true : false}
+            autoComplete="off"
+          />
+
+          <ModalInput
+            label="Room Capacity"
+            input_name="capacity"
+            input_type="number"
+            required
+            defaultValue={isEditMode ? initialData.capacity : ""}
+            autoComplete="off"
+          />
+
           <div className="col-span-2 ">
             <label
               htmlFor="room_type"
