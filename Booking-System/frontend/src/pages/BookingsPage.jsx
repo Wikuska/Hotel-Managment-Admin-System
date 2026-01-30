@@ -4,12 +4,14 @@ import { getBookings } from "../api/bookings";
 import Button from "../components/Button";
 import FetchState from "../components/FetchState";
 import { filterByAllowedValues } from "../utils/dataUtils";
+import NewBookingModal from "../components/NewBookingModal";
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState(false);
   const [activeTab, setActiveTab] = useState("active");
+  const [isModalOpen, setIsModalOpen] = useState(true);
 
   const TAB_STATUSES = {
     active: ["confirmed", "checked in"],
@@ -40,7 +42,10 @@ export default function BookingsPage() {
     <main className="flex flex-col w-full max-w-7xl mx-auto">
       <div className="flex justify-between pb-2">
         <p className="text-4xl">Bookings</p>
-        <Button text="Create new reservation" />
+        <Button
+          text="Create new reservation"
+          onClick={() => setIsModalOpen(true)}
+        />
       </div>
       <p className="text-ml pb-7">Manage guest reservations and check-ins</p>
       <div className="ml-3">
@@ -49,7 +54,7 @@ export default function BookingsPage() {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`
-        pb-3 px-4 text-sm font-medium transition-colors relative
+        pb-3 px-4 text-sm font-medium transition-colors relative capitalize
         ${
           activeTab === tab
             ? "text-blue-600 border-b-2 border-blue-600"
@@ -57,9 +62,7 @@ export default function BookingsPage() {
         }
       `}
           >
-            {tab === "active" && "Active"}
-            {tab === "archived" && "Archived"}
-            {tab === "all" && "All"}
+            {tab}
           </button>
         ))}
       </div>
@@ -85,6 +88,10 @@ export default function BookingsPage() {
           </FetchState>
         </div>
       </div>
+      <NewBookingModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </main>
   );
 }
