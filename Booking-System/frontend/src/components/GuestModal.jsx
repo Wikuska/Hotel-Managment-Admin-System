@@ -1,7 +1,6 @@
 import ModalWrapper from "./ModalWrapper";
 import Button from "./Button";
 import ModalInput from "./ModalInput";
-import { MODAL_INPUT_CLASS } from "../utils/constants";
 
 export default function GuestModal({ isOpen, onClose, onSubmit, initialData }) {
   const isEditMode = !!initialData;
@@ -10,12 +9,7 @@ export default function GuestModal({ isOpen, onClose, onSubmit, initialData }) {
     event.preventDefault();
     const formData = new FormData(event.target);
 
-    const data = {
-      first_name: formData.get("first_name"),
-      last_name: formData.get("last_name"),
-      email: formData.get("email"),
-      phone: formData.get("phone"),
-    };
+    const data = Object.fromEntries(formData);
 
     onSubmit(data);
   };

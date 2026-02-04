@@ -5,7 +5,7 @@ import {
   createGuest,
   updateGuest,
 } from "../api/guests";
-import { filterEntities } from "../utils/dataUtils";
+import { filterEntities, sortEntities } from "../utils/dataUtils";
 import GuestRow from "../components/GuestRow";
 import GuestModal from "../components/GuestModal";
 import FetchState from "../components/FetchState";
@@ -22,6 +22,8 @@ export default function GuestsPage() {
   const filteredGuests = filterEntities(guests, searchQuery, (guest) => {
     return `${guest.first_name} ${guest.last_name}`;
   });
+
+  const sortedGuests = sortEntities(filteredGuests, "last_name");
 
   useEffect(() => {
     async function fetchGuests() {
@@ -127,7 +129,7 @@ export default function GuestsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-300">
-                {filteredGuests.map((guest) => (
+                {sortedGuests.map((guest) => (
                   <GuestRow
                     key={guest.id}
                     guest={guest}

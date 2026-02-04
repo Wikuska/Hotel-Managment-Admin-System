@@ -14,13 +14,7 @@ export default function RoomModal({ isOpen, onClose, onSubmit, initialData }) {
     event.preventDefault();
     const formData = new FormData(event.target);
 
-    const data = {
-      number: formData.get("room_number"),
-      floor: parseInt(formData.get("room_floor")),
-      capacity: parseInt(formData.get("capacity")),
-      room_type: formData.get("room_type"),
-      room_status: formData.get("room_status") || "available",
-    };
+    const data = Object.fromEntries(formData);
 
     onSubmit(data);
   };
@@ -36,14 +30,14 @@ export default function RoomModal({ isOpen, onClose, onSubmit, initialData }) {
         <div className="grid grid-cols-3 gap-4">
           <ModalInput
             label="Room number"
-            input_name="room_number"
+            input_name="number"
             autoComplete="off"
             defaultValue={isEditMode ? initialData.number : ""}
             readOnly={isEditMode ? true : false}
           />
           <ModalInput
             label="Floor Number"
-            input_name="room_floor"
+            input_name="floor"
             input_type="number"
             defaultValue={isEditMode ? initialData.floor : ""}
             readOnly={isEditMode ? true : false}
@@ -54,6 +48,9 @@ export default function RoomModal({ isOpen, onClose, onSubmit, initialData }) {
             label="Room Capacity"
             input_name="capacity"
             input_type="number"
+            min="1"
+            max="4"
+            step="1"
             defaultValue={isEditMode ? initialData.capacity : ""}
             autoComplete="off"
           />
