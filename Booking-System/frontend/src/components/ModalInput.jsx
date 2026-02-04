@@ -5,6 +5,7 @@ export default function ModalInput({
   input_type = "text",
   input_name,
   additional_style = "",
+  required = true,
   ...props
 }) {
   return (

@@ -33,14 +33,12 @@ export default function GuestModal({ isOpen, onClose, onSubmit, initialData }) {
             label="First Name"
             input_name="first_name"
             defaultValue={isEditMode ? initialData.first_name : ""}
-            required
             autoComplete="off"
           />
           <ModalInput
             label="Last Name"
             input_name="last_name"
             defaultValue={isEditMode ? initialData.last_name : ""}
-            required
             autoComplete="off"
           />
           <ModalInput
@@ -48,7 +46,6 @@ export default function GuestModal({ isOpen, onClose, onSubmit, initialData }) {
             input_name="email"
             input_type="emial"
             defaultValue={isEditMode ? initialData.email : ""}
-            required
             autoComplete="off"
           />
           <ModalInput
@@ -56,7 +53,6 @@ export default function GuestModal({ isOpen, onClose, onSubmit, initialData }) {
             input_name="phone"
             input_type="tel"
             defaultValue={isEditMode ? initialData.phone : ""}
-            required
             autoComplete="off"
           />
         </div>

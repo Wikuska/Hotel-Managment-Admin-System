@@ -4,9 +4,31 @@ import { MODAL_INPUT_CLASS, MODAL_LABEL_CLASS } from "../utils/constants";
 import ModalInput from "./ModalInput";
 import Button from "./Button";
 
+const getTodayString = () => {
+  return new Date().toISOString().split("T")[0];
+};
+
+const getNextDay = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  date.setDate(date.getDate() + 1);
+  return date.toISOString().split("T")[0];
+};
+
 export default function NewBookingModal({ isOpen, onClose }) {
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [checkInDate, setCheckInDate] = useState(getTodayString());
+  const [checkOutDate, setCheckOutDate] = useState("");
+
+  const handleCheckInChange = (event) => {
+    const newDate = event.target.value;
+    setCheckInDate(newDate);
+
+    if (checkOutDate && newDate > checkOutDate) {
+      setCheckOutDate("");
+    }
+  };
 
   return (
     <ModalWrapper
@@ -22,11 +44,17 @@ export default function NewBookingModal({ isOpen, onClose }) {
             label="Arrival Date"
             input_type="date"
             input_name="date_in"
+            min={getTodayString()}
+            value={checkInDate}
+            onChange={handleCheckInChange}
           />
           <ModalInput
             label="Departure Date"
             input_type="date"
             input_name="date_out"
+            min={getNextDay(checkInDate)}
+            value={checkOutDate}
+            onChange={(event) => setCheckOutDate(event.target.value)}
           />
           <div className="flex flex-col flex-1">
             <label htmlFor="guests_in_room" className={MODAL_LABEL_CLASS}>

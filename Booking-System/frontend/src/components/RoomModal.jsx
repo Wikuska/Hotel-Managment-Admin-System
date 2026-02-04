@@ -38,7 +38,6 @@ export default function RoomModal({ isOpen, onClose, onSubmit, initialData }) {
             label="Room number"
             input_name="room_number"
             autoComplete="off"
-            required
             defaultValue={isEditMode ? initialData.number : ""}
             readOnly={isEditMode ? true : false}
           />
@@ -46,7 +45,6 @@ export default function RoomModal({ isOpen, onClose, onSubmit, initialData }) {
             label="Floor Number"
             input_name="room_floor"
             input_type="number"
-            required
             defaultValue={isEditMode ? initialData.floor : ""}
             readOnly={isEditMode ? true : false}
             autoComplete="off"
@@ -56,7 +54,6 @@ export default function RoomModal({ isOpen, onClose, onSubmit, initialData }) {
             label="Room Capacity"
             input_name="capacity"
             input_type="number"
-            required
             defaultValue={isEditMode ? initialData.capacity : ""}
             autoComplete="off"
           />
