@@ -3,48 +3,35 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.db.deps import get_db
-from app.models.room import Room
-from app.schemas.room import RoomCreate, RoomRead
+from app.schemas import RoomCreate, RoomRead
+from app import crud
 
 router = APIRouter(prefix="/rooms", tags=["rooms"])
 
 @router.get("", response_model=List[RoomRead])
 def get_rooms(db: Session = Depends(get_db)):
-    return db.query(Room).all()
+    return crud.get_rooms(db)
 
-@router.post("", response_model=RoomRead)
+@router.post("", response_model=RoomRead, status_code=status.HTTP_201_CREATED)
 def create_room(data: RoomCreate, db: Session = Depends(get_db)):
-    room = Room(**data.model_dump())
-    db.add(room)
-
-    try:
-        db.commit()
-    except Exception:
-        db.rollback()
-        raise HTTPException(status_code=400, detail="Room number must be unique (or invalid data)")
-
-    db.refresh(room)
+    room = crud.create_room(db, data)
+    if room is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Room number must be unique (or invalid data)"
+        )
     return room
 
 @router.put("/update/{room_id}", response_model=RoomRead)
 def update_room(room_id: int, data: RoomCreate, db: Session = Depends(get_db)):
-    room = db.query(Room).filter(Room.id == room_id).first()
-    if not room:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Guest not found")
-    update_data = data.model_dump(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(room, key, value)
-        
-    db.commit()
-    db.refresh(room)
+    room = crud.update_room(db, room_id, data)
+    if room is None:
+        raise HTTPException(status_code=404, detail="Room not found")
     return room
 
 @router.delete("/delete/{room_id}")
 def delete_room(room_id: int, db: Session = Depends(get_db)):
-    room = db.query(Room).filter(Room.id == room_id).first()
-    if not room:
+    success = crud.delete_room(db, room_id)
+    if not success:
         raise HTTPException(status_code=404, detail="Room not found")
-    
-    db.delete(room)
-    db.commit
-    return {"deleted":True}
+    return {"deleted": True}
