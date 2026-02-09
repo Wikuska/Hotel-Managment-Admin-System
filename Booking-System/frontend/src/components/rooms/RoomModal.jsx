@@ -1,11 +1,11 @@
-import ModalWrapper from "./ModalWrapper";
-import Button from "./Button";
-import ModalInput from "./ModalInput";
+import ModalWrapper from "../UI/ModalWrapper";
+import Button from "../UI/Button";
+import ModalInput from "../UI/ModalInput";
 import {
   ROOM_TYPES,
   MODAL_INPUT_CLASS,
   ROOM_STATUSES,
-} from "../utils/constants";
+} from "../../utils/constants";
 
 export default function RoomModal({ isOpen, onClose, onSubmit, initialData }) {
   const isEditMode = !!initialData;

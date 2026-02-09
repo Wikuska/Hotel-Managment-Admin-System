@@ -1,5 +1,5 @@
 import { NotebookPen, DoorOpen } from "lucide-react";
-import { BOOKING_STATUSES } from "../utils/constants";
+import { BOOKING_STATUSES } from "../../utils/constants";
 
 export default function BookingRow({ booking }) {
   const statusConfig = BOOKING_STATUSES.find((s) => s.value === booking.status);
