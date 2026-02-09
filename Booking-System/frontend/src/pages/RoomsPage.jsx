@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { getRooms, createRoom, updateRoom } from "../api/rooms";
 import { sortEntities } from "../utils/dataUtils";
-import RoomRow from "../components/RoomRow";
-import RoomModal from "../components/RoomModal";
-import FetchState from "../components/FetchState";
-import Button from "../components/Button";
+import RoomRow from "../components/rooms/RoomRow";
+import RoomModal from "../components/rooms/RoomModal";
+import FetchState from "../components/ui/FetchState";
+import Button from "../components/ui/Button";
 
 export default function RoomsPage() {
   const [rooms, setRooms] = useState([]);

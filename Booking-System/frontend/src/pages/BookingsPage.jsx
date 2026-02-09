@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import BookingRow from "../components/BookingRow";
+import BookingRow from "../components/bookings/BookingRow";
 import { getBookings } from "../api/bookings";
-import Button from "../components/Button";
-import FetchState from "../components/FetchState";
+import Button from "../components/ui/Button";
+import FetchState from "../components/ui/FetchState";
 import { filterByAllowedValues } from "../utils/dataUtils";
-import NewBookingModal from "../components/NewBookingModal";
+import NewBookingModal from "../components/bookings/NewBookingModal";
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState([]);
@@ -14,8 +14,8 @@ export default function BookingsPage() {
   const [isModalOpen, setIsModalOpen] = useState(true);
 
   const TAB_STATUSES = {
-    active: ["confirmed", "checked in"],
-    archived: ["checked out", "cancelled", "no show"],
+    active: ["confirmed", "checked_in"],
+    archived: ["checked_out", "cancelled", "no_show"],
     all: null,
   };
 

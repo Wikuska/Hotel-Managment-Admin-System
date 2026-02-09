@@ -26,10 +26,8 @@ export async function getAvailableRooms(rooms, checkIn, checkOut, guestCount) {
     const availableRooms = [];
 
     for (const room of rooms) {
-      // Exact capacity match
       if (room.capacity !== guestCount) continue;
 
-      // Check availability
       const available = await isRoomAvailable(
         room.id,
         checkIn,
@@ -62,9 +60,6 @@ export function getConfigurationsForCapacity(rooms, capacity) {
   return Array.from(configs).sort();
 }
 
-/**
- * Filter rooms by selected configuration
- */
 export function filterRoomsByConfiguration(rooms, configLabel) {
   const typeMap = Object.fromEntries(ROOM_TYPES.map((t) => [t.value, t.desc]));
 

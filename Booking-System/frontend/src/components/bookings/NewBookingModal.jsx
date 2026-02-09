@@ -1,10 +1,10 @@
 import { useState } from "react";
-import ModalWrapper from "../ModalWrapper";
+import ModalWrapper from "../ui/ModalWrapper";
 import { MODAL_INPUT_CLASS, MODAL_LABEL_CLASS } from "../../utils/constants";
-import ModalInput from "../ModalInput";
+import ModalInput from "../ui/ModalInput";
 import Button from "../Button";
 import RoomCard from "../rooms/RoomCard";
-import FilterChip from "../FilterChip";
+import FilterChip from "../ui/FilterChip";
 import {
   getAvailableRooms,
   getConfigurationsForCapacity,

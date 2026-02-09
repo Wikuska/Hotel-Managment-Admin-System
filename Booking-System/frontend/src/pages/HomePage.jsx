@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import StatCard from "../components/StatCard";
+import StatCard from "../components/ui/StatCard";
 import { CalendarDays, Bed, User, BookmarkX } from "lucide-react";
 import { getDashboardStats } from "../api/dashboard";
 import { Loader2 } from "lucide-react";
