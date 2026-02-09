@@ -74,7 +74,7 @@ export default function NewBookingModal({ isOpen, onClose }) {
       setRooms(allRooms);
 
       const available = await getAvailableRooms(
-        allRooms,
+        rooms,
         checkInDate,
         checkOutDate,
         numGuests,

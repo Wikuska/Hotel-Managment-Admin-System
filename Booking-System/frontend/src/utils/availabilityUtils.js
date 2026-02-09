@@ -9,6 +9,9 @@ export async function isRoomAvailable(roomId, checkIn, checkOut, bookings) {
   const checkOutDate = new Date(checkOut);
 
   return !bookings.some((booking) => {
+    if (booking.room_id !== roomId) {
+      return false;
+    }
     const bookingStart = new Date(booking.date_from);
     const bookingEnd = new Date(booking.date_to);
 
@@ -27,6 +30,7 @@ export async function getAvailableRooms(rooms, checkIn, checkOut, guestCount) {
 
     for (const room of rooms) {
       if (room.capacity !== guestCount) continue;
+      if (room.room_status === "maintenance") continue;
 
       const available = await isRoomAvailable(
         room.id,
