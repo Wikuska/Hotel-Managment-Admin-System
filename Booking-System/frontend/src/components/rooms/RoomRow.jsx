@@ -1,5 +1,5 @@
 import { NotebookPen } from "lucide-react";
-import { ROOM_STATUSES, ROOM_TYPES } from "../utils/constants";
+import { ROOM_STATUSES, ROOM_TYPES } from "../../utils/constants";
 
 export default function RoomRow({ room, onEdit }) {
   const typeConfig = ROOM_TYPES.find((s) => s.value === room.room_type);

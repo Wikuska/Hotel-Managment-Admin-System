@@ -1,6 +1,6 @@
-import ModalWrapper from "./ModalWrapper";
-import Button from "./Button";
-import ModalInput from "./ModalInput";
+import ModalWrapper from "../ui/ModalWrapper";
+import Button from "../ui/Button";
+import ModalInput from "../ui/ModalInput";
 
 export default function GuestModal({ isOpen, onClose, onSubmit, initialData }) {
   const isEditMode = !!initialData;

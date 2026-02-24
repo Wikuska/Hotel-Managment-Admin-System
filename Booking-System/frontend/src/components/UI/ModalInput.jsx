@@ -1,4 +1,4 @@
-import { MODAL_INPUT_CLASS, MODAL_LABEL_CLASS } from "../utils/constants";
+import { MODAL_INPUT_CLASS, MODAL_LABEL_CLASS } from "../../utils/constants";
 
 export default function ModalInput({
   label,
@@ -17,6 +17,7 @@ export default function ModalInput({
         <input
           type={input_type}
           name={input_name}
+          required={required}
           className={`${MODAL_INPUT_CLASS} ${additional_style}`}
           {...props}
         />

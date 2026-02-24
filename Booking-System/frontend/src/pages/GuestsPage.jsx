@@ -6,10 +6,10 @@ import {
   updateGuest,
 } from "../api/guests";
 import { filterEntities, sortEntities } from "../utils/dataUtils";
-import GuestRow from "../components/GuestRow";
-import GuestModal from "../components/GuestModal";
-import FetchState from "../components/FetchState";
-import Button from "../components/Button";
+import GuestRow from "../components/guests/GuestRow";
+import GuestModal from "../components/guests/GuestModal";
+import FetchState from "../components/ui/FetchState";
+import Button from "../components/ui/Button";
 
 export default function GuestsPage() {
   const [guests, setGuests] = useState([]);

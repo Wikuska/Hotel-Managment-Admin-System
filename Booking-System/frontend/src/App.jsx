@@ -1,7 +1,7 @@
 import HomePage from "./pages/HomePage";
 import RoomsPage from "./pages/RoomsPage";
 import GuestsPage from "./pages/GuestsPage";
-import Navbar from "./components/Navbar";
+import Navbar from "./components/layout/Navbar";
 import BookingsPage from "./pages/BookingsPage";
 import { Routes, Route } from "react-router-dom";
 

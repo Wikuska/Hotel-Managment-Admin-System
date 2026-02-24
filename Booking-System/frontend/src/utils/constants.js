@@ -77,13 +77,13 @@ export const BOOKING_STATUSES = [
       "bg-green-100 text-green-800 border border-green-200 px-3 py-1 rounded-full",
   },
   {
-    value: "checked in",
+    value: "checked_in",
     label: "Checked in",
     color:
       "bg-blue-100 text-blue-800 border border-blue-200 px-3 py-1 rounded-full",
   },
   {
-    value: "checked out",
+    value: "checked_out",
     label: "Checked out",
     color:
       "bg-gray-100 text-gray-800 border border-gray-200 px-3 py-1 rounded-full",
@@ -95,7 +95,7 @@ export const BOOKING_STATUSES = [
       "bg-red-100 text-red-800 border border-red-200 px-3 py-1 rounded-full",
   },
   {
-    value: "no show",
+    value: "no_show",
     label: "No show",
     color:
       "bg-purple-100 text-purple-800 border border-purple-200 px-3 py-1 rounded-full",
