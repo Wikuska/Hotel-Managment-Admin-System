@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import StatCard from "../components/ui/StatCard";
-import { CalendarDays, Bed, User, BookmarkX } from "lucide-react";
+import ErrorBanner from "../components/UI/ErrorBanner";
+import { CalendarDays, Bed, User, BookmarkX, Loader2 } from "lucide-react";
 import { getDashboardStats } from "../api/dashboard";
-import { Loader2 } from "lucide-react";
 
 export default function HomePage() {
   const [stats, setStats] = useState({
@@ -12,16 +12,25 @@ export default function HomePage() {
     guests_in_house: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     async function fetchDashboardStats() {
       try {
+        setError(null);
         const data = await getDashboardStats();
         setStats(data);
-      } catch (error) {
-        alert({
-          message: error.message || "Failed to fetch guests dashboard data",
-        });
+      } catch (e) {
+        let displayMsg = "An unexpected error occurred.";
+
+        if (!navigator.onLine) {
+          displayMsg = "Check your internet connection.";
+        } else if (e.message) {
+          console.error(e);
+          displayMsg = "Failed to retrieve data from server.";
+        }
+
+        setError(displayMsg);
       } finally {
         setIsLoading(false);
       }
@@ -32,6 +41,7 @@ export default function HomePage() {
 
   return (
     <main className="flex flex-col w-full max-w-7xl mx-auto">
+      <ErrorBanner message={error} onClose={() => setError(null)} />
       <div className="my-auto bg-zinc-300 shadow-lg rounded-xl p-8 border">
         <div className="flex justify-between">
           <p className="text-4xl">Front Desk Overview</p>
