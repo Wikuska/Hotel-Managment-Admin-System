@@ -10,8 +10,16 @@ export async function api(path, options = {}) {
   });
 
   if (!res.ok) {
-    const error = await res.json().catch(() => null);
-    throw new Error(error?.detail || `HTTP ${res.status}`);
+    const errorData = await res.json().catch(() => ({}));
+
+    const error = new Error(errorData.detail || `HTTP ${res.status}`);
+
+    error.response = {
+      status: res.status,
+      data: errorData,
+    };
+
+    throw error;
   }
 
   if (res.status === 204) return null;
