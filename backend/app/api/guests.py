@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response 
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from typing import List
 
 from app.db.deps import get_db
@@ -42,7 +43,16 @@ def update_guest(guest_id: int, data: GuestUpdate, db: Session = Depends(get_db)
 
 @router.delete("/{guest_id}")
 def delete_guest(guest_id: int, db: Session = Depends(get_db)):
-    success = crud.delete_guest(db, guest_id)
-    if not success:
-        raise HTTPException(status_code=404, detail="Guest not found")
-    return {"deleted": True}
+    db_guest = crud.get_guest(db, guest_id)
+    if not db_guest:
+        raise HTTPException(status_code=404, detail="Giest not found")
+    
+    try:
+        crud.delete_guest(db, db_guest)
+        
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=409, detail="Cannot delete guest linked to active booking")
+    
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+        
