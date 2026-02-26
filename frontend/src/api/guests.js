@@ -12,7 +12,7 @@ export function createGuest(payload) {
 }
 
 export function updateGuest(id, payload) {
-  return api(`/guests/update/${id}`, {
+  return api(`/guests/${id}`, {
     method: "PUT",
     body: JSON.stringify(payload),
   });

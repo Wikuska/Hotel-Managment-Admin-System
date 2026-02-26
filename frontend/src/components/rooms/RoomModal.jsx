@@ -1,22 +1,49 @@
+import { useState } from "react";
+import { updateRoom, createRoom } from "../../api/rooms";
+import { getApiError } from "../../utils/errorHandler";
 import ModalWrapper from "../ui/ModalWrapper";
 import Button from "../ui/Button";
 import ModalInput from "../ui/ModalInput";
+import ErrorBanner from "../UI/ErrorBanner";
 import {
   ROOM_TYPES,
   MODAL_INPUT_CLASS,
   ROOM_STATUSES,
 } from "../../utils/constants";
 
-export default function RoomModal({ isOpen, onClose, onSubmit, initialData }) {
+export default function RoomModal({ isOpen, onClose, onRefresh, initialData }) {
+  const [error, setError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const isEditMode = !!initialData;
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+
     const formData = new FormData(event.target);
+    const rawData = Object.fromEntries(formData);
 
-    const data = Object.fromEntries(formData);
+    const data = {
+      ...rawData,
+      floor: parseInt(rawData.floor, 10),
+      capacity: parseInt(rawData.capacity, 10),
+    };
 
-    onSubmit(data);
+    try {
+      if (isEditMode) {
+        await updateRoom(initialData.id, data);
+      } else {
+        await createRoom(data);
+      }
+
+      onRefresh();
+      onClose();
+    } catch (err) {
+      setError(getApiError(err));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -26,6 +53,7 @@ export default function RoomModal({ isOpen, onClose, onSubmit, initialData }) {
       title={isEditMode ? "Update room information" : "Create new room"}
       maxWidth="max-w-xl"
     >
+      {error && <ErrorBanner message={error} onClose={() => setError(null)} />}
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-3 gap-4">
           <ModalInput
@@ -63,6 +91,7 @@ export default function RoomModal({ isOpen, onClose, onSubmit, initialData }) {
               Room Type
             </label>
             <select
+              id="room_type"
               name="room_type"
               className={MODAL_INPUT_CLASS}
               defaultValue={isEditMode ? initialData.room_type : "single"}
@@ -82,6 +111,7 @@ export default function RoomModal({ isOpen, onClose, onSubmit, initialData }) {
               Room Status
             </label>
             <select
+              id="room_status"
               name="room_status"
               className={MODAL_INPUT_CLASS}
               defaultValue={isEditMode ? initialData.room_status : "available"}
@@ -96,7 +126,13 @@ export default function RoomModal({ isOpen, onClose, onSubmit, initialData }) {
         </div>
         <div className="flex w-full justify-end">
           <Button
-            text={isEditMode ? "Update" : "Create room"}
+            text={
+              isSubmitting
+                ? "Saving..."
+                : isEditMode
+                  ? "Update room"
+                  : "Create room"
+            }
             additional_style="mt-2"
             type="submit"
           />

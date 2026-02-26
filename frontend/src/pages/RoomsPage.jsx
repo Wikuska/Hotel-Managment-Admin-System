@@ -1,35 +1,26 @@
-import { useState, useEffect } from "react";
-import { getRooms, createRoom, updateRoom } from "../api/rooms";
+import { useState } from "react";
+import { getRooms } from "../api/rooms";
 import { sortEntities } from "../utils/dataUtils";
+import { useApi } from "../hooks/useApi";
 import RoomRow from "../components/rooms/RoomRow";
 import RoomModal from "../components/rooms/RoomModal";
-import FetchState from "../components/ui/FetchState";
+import ErrorBanner from "../components/UI/ErrorBanner";
 import Button from "../components/ui/Button";
 
 export default function RoomsPage() {
-  const [rooms, setRooms] = useState([]);
-  const [isFetching, setIsFetching] = useState(false);
-  const [error, setError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
 
+  const {
+    data: rooms,
+    loading,
+    error,
+    setError,
+    request: refreshRooms,
+  } = useApi(getRooms, { autoFetch: true });
+
   const sortedRooms = sortEntities(rooms, "number", sortOrder);
-
-  useEffect(() => {
-    async function fetchRooms() {
-      setIsFetching(true);
-      try {
-        const rooms = await getRooms();
-        setRooms(rooms);
-      } catch (error) {
-        setError({ message: error.message || "Failed to fetch rooms list" });
-      }
-      setIsFetching(false);
-    }
-
-    fetchRooms();
-  }, []);
 
   const handleOpenCreate = () => {
     setSelectedRoom(null);
@@ -41,34 +32,10 @@ export default function RoomsPage() {
     setIsModalOpen(true);
   };
 
-  const handleSave = async (data) => {
-    try {
-      if (selectedRoom) {
-        const updatedRoom = await updateRoom(selectedRoom.id, data);
-
-        setRooms((prevRooms) =>
-          prevRooms.map((room) =>
-            room.id === updatedRoom.id ? updatedRoom : room,
-          ),
-        );
-      } else {
-        const createdRoom = await createRoom(data);
-
-        if (createdRoom) {
-          setRooms((prev) => [...prev, createdRoom]);
-        }
-        alert("Room created");
-      }
-
-      setIsModalOpen(false);
-    } catch (error) {
-      console.error(error);
-      alert("Operation failed: " + (error?.message ?? String(error)));
-    }
-  };
-
+  if (loading) return <p>Loading rooms...</p>;
   return (
     <main className="flex flex-col w-full max-w-7xl mx-auto">
+      <ErrorBanner message={error} onClose={() => setError(null)} />
       <div className="flex justify-between pb-2">
         <p className="text-4xl">Rooms page</p>
         <Button
@@ -81,53 +48,46 @@ export default function RoomsPage() {
       <p className="text-ml pb-7">Manage status and availability</p>
       <div className=" bg-white shadow-lg rounded-xl border border-gray-100 p-4">
         <div className="border-zinc-200 border-2 rounded-xl overflow-y-auto h-[50vh]">
-          <FetchState
-            isLoading={isFetching}
-            error={error}
-            data={rooms}
-            className=""
-          >
-            <table className=" w-full ">
-              <thead className="bg-zinc-200 sticky top-0">
-                <tr>
-                  <th
-                    className="p-3 text-left w-2/9"
-                    onClick={() =>
-                      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"))
-                    }
-                  >
-                    <div>
-                      Room number
-                      <span className="ml-2 cursor-pointer">
-                        {sortOrder === "asc" ? "⬆️" : "⬇️"}
-                      </span>
-                    </div>
-                  </th>
-                  <th className="text-left w-1/5">Floor</th>
-                  <th className="text-left w-1/5">Room type</th>
-                  <th className="text-left w-1/5">Status</th>
-                  <th className="text-left w-1/5"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-300">
-                {sortedRooms.map((room) => (
-                  <RoomRow
-                    key={room.id}
-                    room={room}
-                    onEdit={() => {
-                      handleOpenEdit(room);
-                    }}
-                  />
-                ))}
-              </tbody>
-            </table>
-          </FetchState>
+          <table className=" w-full ">
+            <thead className="bg-zinc-200 sticky top-0">
+              <tr>
+                <th
+                  className="p-3 text-left w-2/9"
+                  onClick={() =>
+                    setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"))
+                  }
+                >
+                  <div>
+                    Room number
+                    <span className="ml-2 cursor-pointer">
+                      {sortOrder === "asc" ? "⬆️" : "⬇️"}
+                    </span>
+                  </div>
+                </th>
+                <th className="text-left w-1/5">Floor</th>
+                <th className="text-left w-1/5">Room type</th>
+                <th className="text-left w-1/5">Status</th>
+                <th className="text-left w-1/5"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-300">
+              {sortedRooms.map((room) => (
+                <RoomRow
+                  key={room.id}
+                  room={room}
+                  onEdit={() => {
+                    handleOpenEdit(room);
+                  }}
+                />
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
       <RoomModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={handleSave}
+        onRefresh={refreshRooms}
         initialData={selectedRoom}
       />
     </main>

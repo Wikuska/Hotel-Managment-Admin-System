@@ -15,6 +15,7 @@ export default function ModalInput({
           {label}
         </label>
         <input
+          id={input_name}
           type={input_type}
           name={input_name}
           required={required}

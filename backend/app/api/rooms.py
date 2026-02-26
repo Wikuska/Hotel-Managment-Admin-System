@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from typing import List
 
 from app.db.deps import get_db
@@ -17,21 +18,36 @@ def create_room(data: RoomCreate, db: Session = Depends(get_db)):
     room = crud.create_room(db, data)
     if room is None:
         raise HTTPException(
-            status_code=400,
-            detail="Room number must be unique (or invalid data)"
+            status_code=409,
+            detail="Room number must be unique"
         )
     return room
 
-@router.put("/update/{room_id}", response_model=RoomRead)
+@router.put("/{room_id}", response_model=RoomRead)
 def update_room(room_id: int, data: RoomCreate, db: Session = Depends(get_db)):
-    room = crud.update_room(db, room_id, data)
-    if room is None:
+    db_room = crud.get_room(db, room_id)
+    if not db_room:
         raise HTTPException(status_code=404, detail="Room not found")
-    return room
+    
+    updated_room = crud.update_room(db, db_room, data)
+    
+    if not updated_room:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+            detail="Room with this number already exists.")
+    
+    return updated_room
 
-@router.delete("/delete/{room_id}")
+@router.delete("/{room_id}")
 def delete_room(room_id: int, db: Session = Depends(get_db)):
-    success = crud.delete_room(db, room_id)
-    if not success:
+    db_room = crud.get_room(db, room_id)
+    if not db_room:
         raise HTTPException(status_code=404, detail="Room not found")
-    return {"deleted": True}
+    try:
+        db.delete(db_room)
+        db.commit()
+    
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=409, detail="Cannot delete room linked to active booking")
+    
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

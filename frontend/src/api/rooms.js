@@ -12,12 +12,12 @@ export function createRoom(payload) {
 }
 
 export function updateRoom(id, payload) {
-  return api(`/rooms/update/${id}`, {
+  return api(`/rooms/${id}`, {
     method: "PUT",
     body: JSON.stringify(payload),
   });
 }
 
 export function deleteRoom(id) {
-  return api(`/rooms/delete/${id}`, { method: "DELETE" });
+  return api(`/rooms/${id}`, { method: "DELETE" });
 }
