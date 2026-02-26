@@ -7,18 +7,18 @@ export function useApi(apiFunc, { autoFetch = false } = {}) {
   const [error, setError] = useState(null);
 
   // Makes sure if component is still open on screen
-  const isMounded = useRef(true);
+  const isMounted = useRef(true);
 
   useEffect(() => {
-    isMounded.current = true;
+    isMounted.current = true;
     return () => {
-      isMounded.current = false;
+      isMounted.current = false;
     };
   }, []);
 
   const request = useCallback(
     async (...args) => {
-      if (isMounded.current) {
+      if (isMounted.current) {
         setLoading(true);
         setError(null);
       }
@@ -26,18 +26,18 @@ export function useApi(apiFunc, { autoFetch = false } = {}) {
       try {
         const result = await apiFunc(...args);
 
-        if (isMounded.current) {
+        if (isMounted.current) {
           setData(result);
           return result;
         }
       } catch (err) {
-        if (isMounded.current) {
+        if (isMounted.current) {
           const msg = getApiError(err);
           setError(msg);
           throw err;
         }
       } finally {
-        if (isMounded.current) {
+        if (isMounted.current) {
           setLoading(false);
         }
       }
@@ -57,5 +57,6 @@ export function useApi(apiFunc, { autoFetch = false } = {}) {
     error,
     request,
     setError,
+    setData,
   };
 }
