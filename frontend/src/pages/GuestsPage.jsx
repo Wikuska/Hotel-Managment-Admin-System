@@ -68,6 +68,7 @@ export default function GuestsPage() {
       <p className="text-ml pb-7">Update and delete guests data</p>
       <div className=" bg-white shadow-lg rounded-xl border border-gray-100 p-4">
         <input
+          id="guest-search"
           type="text"
           placeholder="Find guest (name/last name)"
           value={searchQuery}

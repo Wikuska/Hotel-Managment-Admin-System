@@ -91,6 +91,7 @@ export default function RoomModal({ isOpen, onClose, onRefresh, initialData }) {
               Room Type
             </label>
             <select
+              id="room_type"
               name="room_type"
               className={MODAL_INPUT_CLASS}
               defaultValue={isEditMode ? initialData.room_type : "single"}
@@ -110,6 +111,7 @@ export default function RoomModal({ isOpen, onClose, onRefresh, initialData }) {
               Room Status
             </label>
             <select
+              id="room_status"
               name="room_status"
               className={MODAL_INPUT_CLASS}
               defaultValue={isEditMode ? initialData.room_status : "available"}

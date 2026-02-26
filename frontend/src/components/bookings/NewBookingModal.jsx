@@ -143,6 +143,7 @@ export default function NewBookingModal({ isOpen, onClose }) {
               Number of guests
             </label>
             <select
+              id="guests_in_room"
               name="guests_in_room"
               className={MODAL_INPUT_CLASS}
               value={numGuests}
