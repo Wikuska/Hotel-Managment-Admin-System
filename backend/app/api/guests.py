@@ -26,20 +26,19 @@ def create_guest(data: GuestCreate, db: Session = Depends(get_db)):
         )
     return guest
         
-@router.put("/update/{guest_id}", response_model=GuestUpdate)
+@router.put("/{guest_id}", response_model=GuestUpdate)
 def update_guest(guest_id: int, data: GuestUpdate, db: Session = Depends(get_db)):
-    result = crud.update_guest(db, guest_id, data)
-    
-    if result is None:
+    db_guest = crud.get_guest(db, guest_id)
+    if not db_guest:
         raise HTTPException(status_code=404, detail="Guest not found")
     
-    if result is False:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Email already assigned to another guest."
-        )
-        
-    return result
+    updated_guest = crud.update_guest(db, db_guest, data)
+    
+    if not updated_guest:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+            detail="Guest with this email already exists.")
+    
+    return updated_guest
 
 @router.delete("/{guest_id}")
 def delete_guest(guest_id: int, db: Session = Depends(get_db)):
@@ -48,7 +47,8 @@ def delete_guest(guest_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Giest not found")
     
     try:
-        crud.delete_guest(db, db_guest)
+        db.delete(db_guest)
+        db.commit()
         
     except IntegrityError:
         db.rollback()

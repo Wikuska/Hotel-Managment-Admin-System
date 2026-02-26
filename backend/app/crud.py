@@ -19,33 +19,22 @@ def create_room(db: Session, room_data: RoomCreate):
         db.commit()
         db.refresh(db_room)
         return db_room
-    except Exception:
+    except IntegrityError:
         db.rollback()
         return None
     
-def update_room(db:Session, room_id:int, room_data:RoomCreate):
-    db_room = db.query(Room).filter(Room.id == room_id).first()
-    
-    if not db_room:
-        return None
-    
+def update_room(db:Session, room:Room, room_data:RoomCreate):
     update_data = room_data.model_dump(exclude_unset=True)
     for key, value in update_data.items():
-        setattr(db_room, key, value)
+        setattr(room, key, value)
         
-    db.commit()
-    db.refresh(db_room)
-    return db_room
-
-def delete_room(db:Session, room_id:int):
-    db_room = db.query(Room).filter(Room.id == room_id).first()
-    
-    if not db_room:
-        return False
-    
-    db.delete(db_room)
-    db.commit()
-    return True
+    try:
+        db.commit()
+        db.refresh(room)
+        return room
+    except IntegrityError:
+        db.rollback()
+        return None
 
 
 # -- GUESTS --
@@ -67,25 +56,18 @@ def create_guest(db: Session, guest_data: GuestCreate):
         db.rollback()
         return None
     
-def update_guest(db:Session, guest_id:int, guest_data:GuestUpdate):
-    db_guest = db.query(Guest).filter(Guest.id == guest_id).first()
-    if not db_guest:
-        return None
+def update_guest(db:Session, guest:Guest, guest_data:GuestUpdate):
     update_data = guest_data.model_dump(exclude_unset=True)
     for key, value in update_data.items():
-        setattr(db_guest, key, value)
+        setattr(guest, key, value)
         
     try:
         db.commit()
-        db.refresh(db_guest)
-        return db_guest
+        db.refresh(guest)
+        return guest
     except IntegrityError:
         db.rollback()
-        return False
-    
-def delete_guest(db:Session, guest: Guest):
-    db.delete(guest)
-    db.commit()
+        return None
 
 
 # -- BOOKINGS --
