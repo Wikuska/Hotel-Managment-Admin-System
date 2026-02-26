@@ -2,7 +2,7 @@ from datetime import date
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from app.models import Room, Guest, Booking
-from app.schemas import RoomCreate, GuestCreate, BookingCreate, BookingStatusEnum
+from app.schemas import RoomCreate, GuestCreate, BookingCreate, BookingStatusEnum, GuestUpdate
 
 # -- ROOMS --
 
@@ -67,7 +67,7 @@ def create_guest(db: Session, guest_data: GuestCreate):
         db.rollback()
         return None
     
-def update_guest(db:Session, guest_id:int, guest_data:GuestCreate):
+def update_guest(db:Session, guest_id:int, guest_data:GuestUpdate):
     db_guest = db.query(Guest).filter(Guest.id == guest_id).first()
     if not db_guest:
         return None
@@ -83,15 +83,9 @@ def update_guest(db:Session, guest_id:int, guest_data:GuestCreate):
         db.rollback()
         return False
     
-def delete_guest(db:Session, guest_id:int):
-    db_guest = db.query(Guest).filter(Guest.id == guest_id).first()
-    
-    if not db_guest:
-        return False
-    
-    db.delete(db_guest)
+def delete_guest(db:Session, guest: Guest):
+    db.delete(guest)
     db.commit()
-    return True
 
 
 # -- BOOKINGS --

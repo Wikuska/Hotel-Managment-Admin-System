@@ -1,17 +1,43 @@
 import ModalWrapper from "../ui/ModalWrapper";
 import Button from "../ui/Button";
 import ModalInput from "../ui/ModalInput";
+import ErrorBanner from "../UI/ErrorBanner";
+import { getApiError } from "../../utils/errorHandler";
+import { useState } from "react";
+import { createGuest, updateGuest } from "../../api/guests";
 
-export default function GuestModal({ isOpen, onClose, onSubmit, initialData }) {
+export default function GuestModal({
+  isOpen,
+  onClose,
+  onRefresh,
+  initialData,
+}) {
+  const [error, setError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const isEditMode = !!initialData;
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const formData = new FormData(event.target);
+    setError(null);
+    setIsSubmitting(true);
 
+    const formData = new FormData(event.target);
     const data = Object.fromEntries(formData);
 
-    onSubmit(data);
+    try {
+      if (isEditMode) {
+        await updateGuest(initialData.id, data);
+      } else {
+        await createGuest(data);
+      }
+
+      onRefresh();
+      onClose();
+    } catch (err) {
+      setError(getApiError(err));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -21,6 +47,7 @@ export default function GuestModal({ isOpen, onClose, onSubmit, initialData }) {
       title={isEditMode ? "Edit guest informations" : "Add new guest"}
       maxWidth="max-w-xl"
     >
+      {error && <ErrorBanner message={error} onClose={() => setError(null)} />}
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-2 grid-rows-2 gap-4">
           <ModalInput
@@ -38,7 +65,7 @@ export default function GuestModal({ isOpen, onClose, onSubmit, initialData }) {
           <ModalInput
             label="Email Address"
             input_name="email"
-            input_type="emial"
+            input_type="email"
             defaultValue={isEditMode ? initialData.email : ""}
             autoComplete="off"
           />
@@ -52,7 +79,13 @@ export default function GuestModal({ isOpen, onClose, onSubmit, initialData }) {
         </div>
         <div className="flex w-full justify-end">
           <Button
-            text={isEditMode ? "Update guest" : "Create guest"}
+            text={
+              isSubmitting
+                ? "Saving..."
+                : isEditMode
+                  ? "Update guest"
+                  : "Create guest"
+            }
             additional_style="mt-2"
             type="submit"
           />

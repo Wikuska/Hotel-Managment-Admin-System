@@ -19,5 +19,5 @@ export function updateGuest(id, payload) {
 }
 
 export function deleteGuest(id) {
-  return api(`/guests/delete/${id}`, { method: "DELETE" });
+  return api(`/guests/${id}`, { method: "DELETE" });
 }

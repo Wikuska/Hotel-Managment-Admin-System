@@ -1,18 +1,20 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response 
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from typing import List
 
 from app.db.deps import get_db
-from app.models import Guest
-from app.schemas import GuestCreate, GuestRead
+from app.schemas import GuestCreate, GuestRead, GuestUpdate
 from app import crud
 
 router = APIRouter(prefix="/guests", tags=["guests"])
 
+# Status 200, if db is empty returns []
 @router.get("", response_model=List[GuestRead])
 def get_guests(db: Session = Depends(get_db)):
     return crud.get_guests(db)
 
+# Status 422 if passed data types is not corresponding with schema, 409 if email is already registered
 @router.post("", response_model=GuestRead, status_code=status.HTTP_201_CREATED)
 def create_guest(data: GuestCreate, db: Session = Depends(get_db)):
     guest = crud.create_guest(db, data)
@@ -24,8 +26,8 @@ def create_guest(data: GuestCreate, db: Session = Depends(get_db)):
         )
     return guest
         
-@router.put("/update/{guest_id}", response_model=GuestRead)
-def update_guest(guest_id: int, data: GuestCreate, db: Session = Depends(get_db)):
+@router.put("/update/{guest_id}", response_model=GuestUpdate)
+def update_guest(guest_id: int, data: GuestUpdate, db: Session = Depends(get_db)):
     result = crud.update_guest(db, guest_id, data)
     
     if result is None:
@@ -39,9 +41,18 @@ def update_guest(guest_id: int, data: GuestCreate, db: Session = Depends(get_db)
         
     return result
 
-@router.delete("/delete/{guest_id}")
+@router.delete("/{guest_id}")
 def delete_guest(guest_id: int, db: Session = Depends(get_db)):
-    success = crud.delete_guest(db, guest_id)
-    if not success:
-        raise HTTPException(status_code=404, detail="Guest not found")
-    return {"deleted": True}
+    db_guest = crud.get_guest(db, guest_id)
+    if not db_guest:
+        raise HTTPException(status_code=404, detail="Giest not found")
+    
+    try:
+        crud.delete_guest(db, db_guest)
+        
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=409, detail="Cannot delete guest linked to active booking")
+    
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+        
