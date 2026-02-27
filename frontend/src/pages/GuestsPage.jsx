@@ -4,7 +4,7 @@ import { filterEntities, sortEntities } from "../utils/dataUtils";
 import { getApiError } from "../utils/errorHandler";
 import GuestRow from "../components/guests/GuestRow";
 import GuestModal from "../components/guests/GuestModal";
-import ErrorBanner from "../components/UI/ErrorBanner";
+import ErrorBanner from "../components/ui/ErrorBanner";
 import Button from "../components/ui/Button";
 import { useApi } from "../hooks/useApi";
 

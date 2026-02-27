@@ -75,26 +75,30 @@ def update_guest(db:Session, guest:Guest, guest_data:GuestUpdate):
 def get_bookings(db: Session):
     return db.query(Booking).all()
 
-def create_booking(db:Session, booking_data:BookingCreate):
+def is_room_available(db: Session, room_id: int, date_from: date, date_to: date):
     
     conflict = (
         db.query(Booking)
-        .filter(Booking.room_id == booking_data.room_id)
-        .filter(Booking.status.in_(["confirmed", "checked in"])) 
-        .filter(booking_data.date_from < Booking.date_to)
-        .filter(booking_data.date_to > Booking.date_from)
+        .filter(Booking.room_id == room_id)
+        .filter(Booking.status.in_([BookingStatusEnum.CONFIRMED.value, BookingStatusEnum.CHECKED_IN.value])) 
+        .filter(date_from < Booking.date_to)
+        .filter(date_to > Booking.date_from)
         .first()
     )
+    return conflict is None
+
+def create_booking(db:Session, booking_data:BookingCreate):
     
-    if conflict:
-        return None
-    
-    db_booking = Booking(**booking_data.model_dump(), status="confirmed")
+    db_booking = Booking(**booking_data.model_dump(), status = BookingStatusEnum.CONFIRMED.value)
     
     db.add(db_booking)
-    db.commit()
-    db.refresh(db_booking)
-    return db_booking
+    try:
+        db.commit()
+        db.refresh(db_booking)
+        return db_booking
+    except IntegrityError:
+        db.rollback()
+        return None
 
 def cancel_booking(db: Session, booking_id: int):
     booking = db.query(Booking).filter(Booking.id == booking_id).first()

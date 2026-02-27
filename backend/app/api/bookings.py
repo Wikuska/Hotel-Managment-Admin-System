@@ -14,6 +14,7 @@ def get_bookings(db: Session = Depends(get_db)):
 
 @router.post("", response_model=BookingRead)
 def create_booking(data: BookingCreate, db: Session = Depends(get_db)):
+    
     if data.date_to <= data.date_from:
         raise HTTPException(status_code=400, detail="Check out date must be after check in date")
 
@@ -22,12 +23,18 @@ def create_booking(data: BookingCreate, db: Session = Depends(get_db)):
     if not crud.get_guest(db, data.guest_id):
         raise HTTPException(status_code=404, detail="Guest not found")
 
+    if not crud.is_room_available(db, data.room_id, data.date_from, data.date_to):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Room is already booked in this date range"
+        )
+    
     booking = crud.create_booking(db, data)
     
     if booking is None:
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, 
-            detail="Room is already booked in this date range"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+            detail="A database error occured while creating the booking"
         )
         
     return booking
