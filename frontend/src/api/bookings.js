@@ -4,7 +4,7 @@ export function getBookings() {
   return api("/bookings");
 }
 
-export function createBooking() {
+export function createBooking(payload) {
   return api("/bookings", {
     method: "POST",
     body: JSON.stringify(payload),

@@ -1,50 +1,58 @@
 import { useState } from "react";
+import { getRooms } from "../../api/rooms";
+import { getGuests } from "../../api/guests";
+import { createBooking } from "../../api/bookings";
+import { useApi } from "../../hooks/useApi";
+
 import ModalWrapper from "../ui/ModalWrapper";
-import { MODAL_INPUT_CLASS, MODAL_LABEL_CLASS } from "../../utils/constants";
-import ModalInput from "../ui/ModalInput";
 import Button from "../ui/Button";
-import RoomCard from "../rooms/RoomCard";
-import FilterChip from "../ui/FilterChip";
+import ErrorBanner from "../ui/ErrorBanner";
+
+import Step1Availability from "./wizard/Step1Availability";
+import Step2Rooms from "./wizard/Step2Rooms";
+import Step3Guests from "./wizard/Step3Guests";
+
 import {
   getAvailableRooms,
   getConfigurationsForCapacity,
   filterRoomsByConfiguration,
 } from "../../utils/availabilityUtils";
-import { getRooms } from "../../api/rooms";
 
 const getTodayString = () => {
   return new Date().toISOString().split("T")[0];
 };
 
-const getNextDay = (dateString) => {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  date.setDate(date.getDate() + 1);
-  return date.toISOString().split("T")[0];
-};
-
-export default function NewBookingModal({ isOpen, onClose }) {
-  // Step flow: 1 = availability, 2 = select room, 3 = select guest
+export default function NewBookingModal({ isOpen, onClose, onRefresh }) {
   const [step, setStep] = useState(1);
-  const [searchQuery, setSearchQuery] = useState("");
   const [checkInDate, setCheckInDate] = useState(getTodayString());
   const [checkOutDate, setCheckOutDate] = useState("");
   const [numGuests, setNumGuests] = useState(1);
+
   const [chosenRoomId, setChosenRoomId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedGuestId, setSelectedGuestId] = useState(null);
 
   const [rooms, setRooms] = useState([]);
   const [availableRooms, setAvailableRooms] = useState([]);
   const [filteredRooms, setFilteredRooms] = useState([]);
   const [selectedConfig, setSelectedConfig] = useState("all");
   const [configurations, setConfigurations] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
+  const [availabilityError, setAvailabilityError] = useState("");
+
+  const {
+    request: submitBooking,
+    loading: isSubmitting,
+    error: submitError,
+    setError: setSubmitError,
+  } = useApi(createBooking);
+
+  const { data: guests = [], request: fetchGuestsList } = useApi(getGuests);
 
   const handleCheckInChange = (event) => {
     const newDate = event.target.value;
     setCheckInDate(newDate);
     setStep(1);
-
     if (checkOutDate && newDate > checkOutDate) {
       setCheckOutDate("");
     }
@@ -60,21 +68,18 @@ export default function NewBookingModal({ isOpen, onClose }) {
     setStep(1);
   };
 
-  const canCheckAvailability =
-    checkInDate && checkOutDate && checkInDate < checkOutDate;
-
   const handleCheckAvailability = async () => {
-    if (!canCheckAvailability) return;
+    if (!checkInDate || !checkOutDate || checkInDate >= checkOutDate) return;
 
-    setIsLoading(true);
-    setError("");
+    setIsLoadingAvailability(true);
+    setAvailabilityError("");
 
     try {
       const allRooms = await getRooms();
       setRooms(allRooms);
 
       const available = await getAvailableRooms(
-        rooms,
+        allRooms,
         checkInDate,
         checkOutDate,
         numGuests,
@@ -91,10 +96,12 @@ export default function NewBookingModal({ isOpen, onClose }) {
       setSearchQuery("");
       setStep(2);
     } catch (err) {
-      setError("Failed to fetch available rooms. Please try again.");
+      setAvailabilityError(
+        "Failed to fetch available rooms. Please try again.",
+      );
       console.error(err);
     } finally {
-      setIsLoading(false);
+      setIsLoadingAvailability(false);
     }
   };
 
@@ -107,6 +114,28 @@ export default function NewBookingModal({ isOpen, onClose }) {
   const handleRoomSelect = (roomId) => {
     setChosenRoomId(roomId);
     setStep(3);
+
+    if (!guests || guests.length === 0) {
+      fetchGuestsList();
+    }
+  };
+
+  const handleConfirmReservation = async () => {
+    if (!chosenRoomId || !selectedGuestId) return;
+
+    const bookingData = {
+      room_id: chosenRoomId,
+      guest_id: selectedGuestId,
+      date_from: checkInDate,
+      date_to: checkOutDate,
+    };
+
+    const result = await submitBooking(bookingData);
+
+    if (result) {
+      if (onRefresh) onRefresh();
+      if (onClose) onClose();
+    }
   };
 
   return (
@@ -116,128 +145,49 @@ export default function NewBookingModal({ isOpen, onClose }) {
       title="New Reservation"
       maxWidth="max-w-5xl"
     >
-      {/* Step 1: Check Availability */}
-      <div className="border-zinc-200 border-2 rounded-xl p-5">
-        <span className="text-2xl font-bold text-gray-900">
-          Check Availability
-        </span>
-        <div className="flex items-end w-full mt-5 gap-4">
-          <ModalInput
-            label="Arrival Date"
-            input_type="date"
-            input_name="date_in"
-            min={getTodayString()}
-            value={checkInDate}
-            onChange={handleCheckInChange}
-          />
-          <ModalInput
-            label="Departure Date"
-            input_type="date"
-            input_name="date_out"
-            min={getNextDay(checkInDate)}
-            value={checkOutDate}
-            onChange={handleCheckOutChange}
-          />
-          <div className="flex flex-col flex-1">
-            <label htmlFor="guests_in_room" className={MODAL_LABEL_CLASS}>
-              Number of guests
-            </label>
-            <select
-              id="guests_in_room"
-              name="guests_in_room"
-              className={MODAL_INPUT_CLASS}
-              value={numGuests}
-              onChange={handleGuestsChange}
-            >
-              {[1, 2, 3, 4].map((number) => (
-                <option key={number} value={number}>
-                  {number}
-                </option>
-              ))}
-            </select>
-          </div>
-          <Button
-            text={isLoading ? "Loading..." : "Check availability"}
-            additional_style="h-11"
-            onClick={handleCheckAvailability}
-            disabled={!canCheckAvailability || isLoading}
-          />
-        </div>
-      </div>
+      <ErrorBanner message={submitError} onClose={() => setSubmitError(null)} />
 
-      {/* Step 2: Select Room */}
+      <Step1Availability
+        checkInDate={checkInDate}
+        checkOutDate={checkOutDate}
+        numGuests={numGuests}
+        isLoading={isLoadingAvailability}
+        onCheckInChange={handleCheckInChange}
+        onCheckOutChange={handleCheckOutChange}
+        onGuestsChange={handleGuestsChange}
+        onCheckAvailability={handleCheckAvailability}
+      />
+
       {step >= 2 && (
-        <div className="border-zinc-200 border-2 rounded-xl p-5 mt-4">
-          <span className="text-2xl font-bold text-gray-900">Select Room</span>
-
-          {error && (
-            <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
-              {error}
-            </div>
-          )}
-
-          {/* Filter Chips */}
-          {configurations.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-2">
-              {configurations.map((config) => (
-                <FilterChip
-                  key={config}
-                  label={config}
-                  isActive={selectedConfig === config}
-                  onClick={() => handleConfigChange(config)}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Room Cards Carousel */}
-          {filteredRooms.length > 0 ? (
-            <div className="mt-4 overflow-x-auto pb-2">
-              <div className="flex gap-4">
-                {filteredRooms.map((room) => (
-                  <RoomCard
-                    key={room.id}
-                    room={room}
-                    isSelected={chosenRoomId === room.id}
-                    onSelect={handleRoomSelect}
-                  />
-                ))}
-              </div>
-            </div>
-          ) : (
-            <p className="mt-4 text-gray-600 text-sm">
-              {isLoading
-                ? "Loading rooms..."
-                : "No rooms available for selected criteria."}
-            </p>
-          )}
-        </div>
+        <Step2Rooms
+          error={availabilityError}
+          configurations={configurations}
+          selectedConfig={selectedConfig}
+          filteredRooms={filteredRooms}
+          chosenRoomId={chosenRoomId}
+          isLoading={isLoadingAvailability}
+          onConfigChange={handleConfigChange}
+          onRoomSelect={handleRoomSelect}
+        />
       )}
 
-      {/* Step 3: Select Guest */}
       {step >= 3 && (
-        <div className="border-zinc-200 border-2 rounded-xl p-5 mt-4">
-          <span className="text-2xl font-bold text-gray-900">Select Guest</span>
-          <div className="mt-5 flex gap-2">
-            <input
-              type="text"
-              placeholder="Find guest (name/last name)"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 border-zinc-200 border-2 rounded-xl p-2"
-            />
-            <Button text="+ New Guest" onClick={() => {}} />
-          </div>
-        </div>
+        <Step3Guests
+          guests={guests}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          selectedGuestId={selectedGuestId}
+          setSelectedGuestId={setSelectedGuestId}
+        />
       )}
 
       <div className="flex justify-end gap-2 pt-5">
         <Button
-          text="Confirm Reservation"
-          onClick={() => {}}
-          disabled={step < 3}
+          text={isSubmitting ? "Confirming..." : "Confirm Reservation"}
+          onClick={handleConfirmReservation}
+          disabled={step < 3 || !selectedGuestId || isSubmitting}
         />
-        <Button text="Cancel" onClick={onClose} />
+        <Button text="Cancel" onClick={onClose} disabled={isSubmitting} />
       </div>
     </ModalWrapper>
   );
