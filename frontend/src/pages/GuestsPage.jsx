@@ -4,8 +4,9 @@ import { filterEntities, sortEntities } from "../utils/dataUtils";
 import { getApiError } from "../utils/errorHandler";
 import GuestRow from "../components/guests/GuestRow";
 import GuestModal from "../components/guests/GuestModal";
-import ErrorBanner from "../components/ui/ErrorBanner";
+import AlertBanner from "../components/UI/AlertBanner";
 import Button from "../components/ui/Button";
+import { useNotification } from "../components/UI/NotificationContext";
 import { useApi } from "../hooks/useApi";
 
 export default function GuestsPage() {
@@ -21,6 +22,7 @@ export default function GuestsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedGuest, setSelectedGuest] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const { showNotification } = useNotification();
 
   const filteredGuests = filterEntities(guests || [], searchQuery, (guest) => {
     return `${guest.first_name} ${guest.last_name}`;
@@ -38,6 +40,15 @@ export default function GuestsPage() {
     setIsModalOpen(true);
   };
 
+  const handleSuccess = () => {
+    refreshGuests();
+
+    const message = selectedGuest
+      ? "Guest updated successfully"
+      : "Guest created successfully";
+    showNotification(message, "success");
+  };
+
   const handleRemoveGuest = async (id) => {
     if (!confirm("Are you sure you want to delete guest?")) return;
 
@@ -47,6 +58,8 @@ export default function GuestsPage() {
       setGuests((currentGuests) =>
         currentGuests.filter((guest) => guest.id != id),
       );
+
+      showNotification("Guest deleted successfully", "success");
     } catch (err) {
       setError(getApiError(err));
     }
@@ -55,7 +68,7 @@ export default function GuestsPage() {
   if (loading) return <p>Loading guests...</p>;
   return (
     <main className="flex flex-col w-full max-w-7xl mx-auto">
-      <ErrorBanner message={error} onClose={() => setError(null)} />
+      <AlertBanner message={error} onClose={() => setError(null)} />
       <div className="flex justify-between pb-2">
         <p className="text-4xl">Guests page</p>
         <Button
@@ -107,7 +120,7 @@ export default function GuestsPage() {
       <GuestModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onRefresh={refreshGuests}
+        onRefresh={handleSuccess}
         initialData={selectedGuest}
       />
     </main>

@@ -6,7 +6,7 @@ import { useApi } from "../../hooks/useApi";
 
 import ModalWrapper from "../ui/ModalWrapper";
 import Button from "../ui/Button";
-import ErrorBanner from "../ui/ErrorBanner";
+import AlertBanner from "../UI/AlertBanner";
 
 import Step1Availability from "./wizard/Step1Availability";
 import Step2Rooms from "./wizard/Step2Rooms";
@@ -145,7 +145,7 @@ export default function NewBookingModal({ isOpen, onClose, onRefresh }) {
       title="New Reservation"
       maxWidth="max-w-5xl"
     >
-      <ErrorBanner message={submitError} onClose={() => setSubmitError(null)} />
+      <AlertBanner message={submitError} onClose={() => setSubmitError(null)} />
 
       <Step1Availability
         checkInDate={checkInDate}

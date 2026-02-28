@@ -2,15 +2,17 @@ import { useState } from "react";
 import { getRooms } from "../api/rooms";
 import { sortEntities } from "../utils/dataUtils";
 import { useApi } from "../hooks/useApi";
+import { useNotification } from "../components/UI/NotificationContext";
 import RoomRow from "../components/rooms/RoomRow";
 import RoomModal from "../components/rooms/RoomModal";
-import ErrorBanner from "../components/UI/ErrorBanner";
+import AlertBanner from "../components/UI/AlertBanner";
 import Button from "../components/ui/Button";
 
 export default function RoomsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
+  const { showNotification } = useNotification();
 
   const {
     data: rooms,
@@ -32,10 +34,19 @@ export default function RoomsPage() {
     setIsModalOpen(true);
   };
 
+  const handleSuccess = () => {
+    refreshRooms();
+
+    const message = selectedRoom
+      ? "Room updated successfully"
+      : "Room created successfully";
+    showNotification(message, "success");
+  };
+
   if (loading) return <p>Loading rooms...</p>;
   return (
     <main className="flex flex-col w-full max-w-7xl mx-auto">
-      <ErrorBanner message={error} onClose={() => setError(null)} />
+      <AlertBanner message={error} onClose={() => setError(null)} />
       <div className="flex justify-between pb-2">
         <p className="text-4xl">Rooms page</p>
         <Button
@@ -87,7 +98,7 @@ export default function RoomsPage() {
       <RoomModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onRefresh={refreshRooms}
+        onRefresh={handleSuccess}
         initialData={selectedRoom}
       />
     </main>

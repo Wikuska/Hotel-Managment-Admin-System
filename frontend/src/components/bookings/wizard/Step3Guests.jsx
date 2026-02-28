@@ -3,7 +3,7 @@ import { createGuest } from "../../../api/guests";
 import { useApi } from "../../../hooks/useApi";
 import Button from "../../ui/Button";
 import ModalInput from "../../ui/ModalInput";
-import ErrorBanner from "../../ui/ErrorBanner";
+import AlertBanner from "../../UI/AlertBanner";
 
 export default function Step3Guests({
   guests,
@@ -39,7 +39,7 @@ export default function Step3Guests({
   if (isQuickAdd) {
     return (
       <div className="border-blue-200 border-2 bg-blue-50/30 rounded-xl p-5 mt-4">
-        <ErrorBanner message={error} onClose={() => setError(null)} />
+        <AlertBanner message={error} onClose={() => setError(null)} />
         <span className="text-xl font-bold text-gray-900">
           Quick Add New Guest
         </span>

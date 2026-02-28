@@ -4,7 +4,7 @@ import { getApiError } from "../../utils/errorHandler";
 import ModalWrapper from "../ui/ModalWrapper";
 import Button from "../ui/Button";
 import ModalInput from "../ui/ModalInput";
-import ErrorBanner from "../UI/ErrorBanner";
+import AlertBanner from "../UI/AlertBanner";
 import {
   ROOM_TYPES,
   MODAL_INPUT_CLASS,
@@ -53,7 +53,7 @@ export default function RoomModal({ isOpen, onClose, onRefresh, initialData }) {
       title={isEditMode ? "Update room information" : "Create new room"}
       maxWidth="max-w-xl"
     >
-      {error && <ErrorBanner message={error} onClose={() => setError(null)} />}
+      {error && <AlertBanner message={error} onClose={() => setError(null)} />}
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-3 gap-4">
           <ModalInput

@@ -20,7 +20,16 @@ export const getApiError = (error) => {
   if (detail) {
     // Pydantic error array
     if (Array.isArray(detail)) {
-      return detail[0].msg;
+      const firstError = detail[0];
+
+      if (firstError.loc && firstError.loc.includes("phone")) {
+        if (
+          firstError.type === "string_pattern_mismatch" ||
+          firstError.msg.includes("pattern")
+        ) {
+          return "Invalid phone format.";
+        }
+      }
     }
 
     // Error with detail msg

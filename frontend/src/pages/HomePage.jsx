@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import StatCard from "../components/ui/StatCard";
-import ErrorBanner from "../components/UI/ErrorBanner";
+import AlertBanner from "../components/UI/AlertBanner";
 import { CalendarDays, Bed, User, BookmarkX, Loader2 } from "lucide-react";
 import { getDashboardStats } from "../api/dashboard";
 
@@ -41,7 +41,7 @@ export default function HomePage() {
 
   return (
     <main className="flex flex-col w-full max-w-7xl mx-auto">
-      <ErrorBanner message={error} onClose={() => setError(null)} />
+      <AlertBanner message={error} onClose={() => setError(null)} />
       <div className="my-auto bg-zinc-300 shadow-lg rounded-xl p-8 border">
         <div className="flex justify-between">
           <p className="text-4xl">Front Desk Overview</p>

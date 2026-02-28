@@ -5,11 +5,13 @@ import Button from "../components/ui/Button";
 import { useApi } from "../hooks/useApi";
 import { filterByAllowedValues } from "../utils/dataUtils";
 import NewBookingModal from "../components/bookings/NewBookingModal";
-import ErrorBanner from "../components/ui/ErrorBanner";
+import AlertBanner from "../components/UI/AlertBanner";
+import { useNotification } from "../components/UI/NotificationContext";
 
 export default function BookingsPage() {
   const [activeTab, setActiveTab] = useState("active");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { showNotification } = useNotification();
 
   const TAB_STATUSES = {
     active: ["confirmed", "checked_in"],
@@ -21,6 +23,7 @@ export default function BookingsPage() {
     data: bookings = [],
     loading,
     error,
+    setError,
     request: refreshBookings,
   } = useApi(getBookings, { autoFetch: true });
 
@@ -28,10 +31,15 @@ export default function BookingsPage() {
     ? filterByAllowedValues(bookings, "status", TAB_STATUSES[activeTab])
     : bookings;
 
+  const handleSuccess = () => {
+    refreshBookings();
+    showNotification("Reservation successfully created!", "success");
+  };
+
   if (loading) return <p>Loading bookings...</p>;
   return (
     <main className="flex flex-col w-full max-w-7xl mx-auto">
-      <ErrorBanner message={error} onClose={() => setError(null)} />
+      <AlertBanner message={error} onClose={() => setError(null)} />
       <div className="flex justify-between pb-2">
         <p className="text-4xl">Bookings</p>
         <Button
@@ -71,7 +79,7 @@ export default function BookingsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-300">
-              {bookingsInTab.map((booking) => (
+              {bookingsInTab?.map((booking) => (
                 <BookingRow key={booking.id} booking={booking} />
               ))}
             </tbody>
@@ -81,7 +89,7 @@ export default function BookingsPage() {
       <NewBookingModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onRefresh={refreshBookings}
+        onRefresh={handleSuccess}
       />
     </main>
   );
