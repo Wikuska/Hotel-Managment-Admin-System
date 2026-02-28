@@ -95,12 +95,14 @@ export default function RoomsPage() {
           </table>
         </div>
       </div>
-      <RoomModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onRefresh={handleSuccess}
-        initialData={selectedRoom}
-      />
+      {isModalOpen && (
+        <RoomModal
+          isOpen={true}
+          onClose={() => setIsModalOpen(false)}
+          onRefresh={handleSuccess}
+          initialData={selectedRoom}
+        />
+      )}
     </main>
   );
 }

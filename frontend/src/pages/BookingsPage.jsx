@@ -86,11 +86,13 @@ export default function BookingsPage() {
           </table>
         </div>
       </div>
-      <NewBookingModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onRefresh={handleSuccess}
-      />
+      {isModalOpen && (
+        <NewBookingModal
+          isOpen={true}
+          onClose={() => setIsModalOpen(false)}
+          onRefresh={handleSuccess}
+        />
+      )}
     </main>
   );
 }

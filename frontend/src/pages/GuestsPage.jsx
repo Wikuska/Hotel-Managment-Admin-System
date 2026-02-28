@@ -117,12 +117,14 @@ export default function GuestsPage() {
           </table>
         </div>
       </div>
-      <GuestModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onRefresh={handleSuccess}
-        initialData={selectedGuest}
-      />
+      {isModalOpen && (
+        <GuestModal
+          isOpen={true}
+          onClose={() => setIsModalOpen(false)}
+          onRefresh={handleSuccess}
+          initialData={selectedGuest}
+        />
+      )}
     </main>
   );
 }
