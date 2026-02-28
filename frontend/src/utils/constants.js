@@ -5,34 +5,42 @@ export const ROOM_TYPES = [
   {
     value: "single",
     desc: "1 Single",
+    capacity: 1,
   },
   {
     value: "double",
     desc: "1 Double",
+    capacity: 2,
   },
   {
     value: "twin",
     desc: "2 Single",
+    capacity: 2,
   },
   {
     value: "triple_1d1s",
     desc: "1 Double + 1 Single",
+    capacity: 3,
   },
   {
     value: "triple_3s",
     desc: "3 Single",
+    capacity: 3,
   },
   {
     value: "quad_2d",
     desc: "2 Double",
+    capacity: 4,
   },
   {
     value: "quad_1d2s",
     desc: "1 Double + 2 Single",
+    capacity: 4,
   },
   {
     value: "quad_4s",
     desc: "4 Single",
+    capacity: 4,
   },
 ];
 

@@ -14,7 +14,15 @@ import {
 export default function RoomModal({ isOpen, onClose, onRefresh, initialData }) {
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedType, setSelectedType] = useState(
+    initialData ? initialData.room_type : "single",
+  );
   const isEditMode = !!initialData;
+
+  const currentRoomInfo = ROOM_TYPES.find(
+    (type) => type.value === selectedType,
+  );
+  const currentCapacity = currentRoomInfo ? currentRoomInfo.capacity : 1;
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -76,11 +84,8 @@ export default function RoomModal({ isOpen, onClose, onRefresh, initialData }) {
             label="Room Capacity"
             input_name="capacity"
             input_type="number"
-            min="1"
-            max="4"
-            step="1"
-            defaultValue={isEditMode ? initialData.capacity : ""}
-            autoComplete="off"
+            value={currentCapacity}
+            readOnly={true}
           />
 
           <div className="col-span-2 ">
@@ -94,7 +99,8 @@ export default function RoomModal({ isOpen, onClose, onRefresh, initialData }) {
               id="room_type"
               name="room_type"
               className={MODAL_INPUT_CLASS}
-              defaultValue={isEditMode ? initialData.room_type : "single"}
+              value={selectedType}
+              onChange={(e) => setSelectedType(e.target.value)}
             >
               {ROOM_TYPES.map((type) => (
                 <option key={type.value} value={type.value}>
