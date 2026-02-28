@@ -1,43 +1,21 @@
-import { useEffect, useState } from "react";
+import { useApi } from "../hooks/useApi";
 import StatCard from "../components/ui/StatCard";
 import AlertBanner from "../components/UI/AlertBanner";
 import { CalendarDays, Bed, User, BookmarkX, Loader2 } from "lucide-react";
 import { getDashboardStats } from "../api/dashboard";
 
 export default function HomePage() {
-  const [stats, setStats] = useState({
-    arrivals_today: 0,
-    departures_today: 0,
-    available_rooms: 0,
-    guests_in_house: 0,
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    async function fetchDashboardStats() {
-      try {
-        setError(null);
-        const data = await getDashboardStats();
-        setStats(data);
-      } catch (e) {
-        let displayMsg = "An unexpected error occurred.";
-
-        if (!navigator.onLine) {
-          displayMsg = "Check your internet connection.";
-        } else if (e.message) {
-          console.error(e);
-          displayMsg = "Failed to retrieve data from server.";
-        }
-
-        setError(displayMsg);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchDashboardStats();
-  }, []);
+  const {
+    data: stats = {
+      arrivals_today: 0,
+      departures_today: 0,
+      available_rooms: 0,
+      guests_in_house: 0,
+    },
+    loading: isLoading,
+    error,
+    setError,
+  } = useApi(getDashboardStats, { autoFetch: true });
 
   return (
     <main className="flex flex-col w-full max-w-7xl mx-auto">
