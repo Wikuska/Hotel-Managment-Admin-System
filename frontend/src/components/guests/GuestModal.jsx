@@ -1,7 +1,7 @@
 import ModalWrapper from "../ui/ModalWrapper";
 import Button from "../ui/Button";
 import ModalInput from "../ui/ModalInput";
-import ErrorBanner from "../UI/ErrorBanner";
+import ErrorBanner from "../ui/ErrorBanner";
 import { getApiError } from "../../utils/errorHandler";
 import { useState } from "react";
 import { createGuest, updateGuest } from "../../api/guests";

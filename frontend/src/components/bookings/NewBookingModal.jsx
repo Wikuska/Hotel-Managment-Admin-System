@@ -178,6 +178,7 @@ export default function NewBookingModal({ isOpen, onClose, onRefresh }) {
           setSearchQuery={setSearchQuery}
           selectedGuestId={selectedGuestId}
           setSelectedGuestId={setSelectedGuestId}
+          onGuestAdded={fetchGuestsList}
         />
       )}
 
