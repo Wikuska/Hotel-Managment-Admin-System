@@ -1,12 +1,13 @@
 import { useState } from "react";
-import BookingRow from "../components/bookings/BookingRow";
 import { getBookings } from "../api/bookings";
-import Button from "../components/ui/Button";
+import { useNotification } from "../components/UI/NotificationContext";
+import { Loader2 } from "lucide-react";
 import { useApi } from "../hooks/useApi";
 import { filterByAllowedValues } from "../utils/dataUtils";
+import Button from "../components/ui/Button";
+import BookingRow from "../components/bookings/BookingRow";
 import NewBookingModal from "../components/bookings/NewBookingModal";
 import AlertBanner from "../components/UI/AlertBanner";
-import { useNotification } from "../components/UI/NotificationContext";
 
 export default function BookingsPage() {
   const [activeTab, setActiveTab] = useState("active");
@@ -36,56 +37,83 @@ export default function BookingsPage() {
     showNotification("Reservation successfully created!", "success");
   };
 
-  if (loading) return <p>Loading bookings...</p>;
   return (
-    <main className="flex flex-col w-full max-w-7xl mx-auto">
+    <main className="flex flex-col w-full max-w-7xl mx-auto pb-10">
       <AlertBanner message={error} onClose={() => setError(null)} />
-      <div className="flex justify-between pb-2">
-        <p className="text-4xl">Bookings</p>
+
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6">
+        <div>
+          <h1 className="text-4xl font-semibold text-zinc-800">Bookings</h1>
+          <p className="text-lg text-zinc-500 mt-2">
+            Manage guest reservations and check-ins
+          </p>
+        </div>
         <Button
           text="Create new reservation"
           onClick={() => setIsModalOpen(true)}
         />
       </div>
-      <p className="text-ml pb-7">Manage guest reservations and check-ins</p>
-      <div className="ml-3">
-        {["active", "archived", "all"].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`
-        pb-3 px-4 text-sm font-medium transition-colors relative capitalize
-        ${
-          activeTab === tab
-            ? "text-blue-600 border-b-2 border-blue-600"
-            : "text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 border-transparent"
-        }
-      `}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-      <div className=" bg-white shadow-lg rounded-xl border border-gray-100 p-4">
-        <div className="border-zinc-200 border-2 rounded-xl overflow-y-auto h-[50vh]">
-          <table className=" w-full ">
-            <thead className="bg-zinc-200 sticky top-0">
-              <tr>
-                <th className="p-3 text-left w-2/9">Room</th>
-                <th className="text-left w-2/9">Guest</th>
-                <th className="text-left w-3/9">Check-in/Check-out date</th>
-                <th className="text-left w-1/9">Status</th>
-                <th className="w-1/9"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-300">
-              {bookingsInTab?.map((booking) => (
-                <BookingRow key={booking.id} booking={booking} />
-              ))}
-            </tbody>
-          </table>
+
+      <div className="bg-white shadow-md rounded-2xl border border-zinc-200">
+        <div className="flex border-b border-zinc-200 px-6 pt-2 overflow-x-auto">
+          {["active", "archived", "all"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`
+                py-3 px-4 text-sm font-medium transition-colors capitalize border-b-2 whitespace-nowrap
+                ${
+                  activeTab === tab
+                    ? "text-blue-600 border-blue-600"
+                    : "text-zinc-500 hover:text-zinc-700 hover:border-zinc-300 border-transparent"
+                }
+              `}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        <div className="p-6">
+          <div className="border border-zinc-200 rounded-xl shadow-sm h-[60vh] overflow-auto">
+            <table className="w-full min-w-200 text-sm text-left">
+              <thead className="bg-zinc-100 sticky top-0 text-zinc-600 font-medium z-10 border-b border-zinc-200">
+                <tr>
+                  <th className="p-4 w-1/6">Room</th>
+                  <th className="p-4 w-1/4">Guest</th>
+                  <th className="p-4 w-1/3">Check-in/Check-out</th>
+                  <th className="p-4 w-1/6">Status</th>
+                  <th className="p-4 w-24 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-200 bg-white">
+                {loading ? (
+                  <tr>
+                    <td colSpan="5" className="p-8 text-center text-zinc-500">
+                      <Loader2
+                        className="animate-spin inline-block mr-2 align-middle"
+                        size={20}
+                      />
+                      <span className="align-middle">Loading data...</span>
+                    </td>
+                  </tr>
+                ) : bookingsInTab?.length > 0 ? (
+                  bookingsInTab.map((booking) => (
+                    <BookingRow key={booking.id} booking={booking} />
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="p-8 text-center text-zinc-500">
+                      No {activeTab} bookings found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
+
       {isModalOpen && (
         <NewBookingModal
           isOpen={true}

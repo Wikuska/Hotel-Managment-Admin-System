@@ -2,15 +2,16 @@ import Navbutton from "./Navbutton";
 
 export default function Navbar() {
   return (
-    <nav className="bg-neutral-primary fixed w-full z-20 top-0 start-0 border  border-gray-200 bg-white">
-      <div className="max-w-screen flex flex-wrap items-center justify-between mx-auto p-5 pl-20 pr-20">
-        <a>
-          <span className="self-center text-3xl text-heading whitespace-nowrap">
+    <nav className="sticky top-0 z-30 w-full bg-white border-b border-zinc-200 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between w-full p-4 px-6 md:px-12 lg:px-20">
+        <a href="/" className="cursor-pointer">
+          <span className="self-center text-2xl font-semibold whitespace-nowrap text-zinc-800">
             Hotel Admin System
           </span>
         </a>
-        <div className="block w-auto">
-          <ul className="flex flex-row space-x-15 border-0">
+
+        <div className="w-full md:w-auto mt-4 md:mt-0">
+          <ul className="flex flex-row flex-wrap justify-center gap-4 md:gap-8">
             <Navbutton href={"/"} name={"Dashboard"} />
             <Navbutton href={"/bookings"} name={"Bookings"} />
             <Navbutton href={"/rooms"} name={"Rooms"} />

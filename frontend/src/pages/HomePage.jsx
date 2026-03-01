@@ -1,8 +1,8 @@
 import { useApi } from "../hooks/useApi";
-import StatCard from "../components/ui/StatCard";
-import AlertBanner from "../components/UI/AlertBanner";
 import { CalendarDays, Bed, User, BookmarkX, Loader2 } from "lucide-react";
 import { getDashboardStats } from "../api/dashboard";
+import StatCard from "../components/ui/StatCard";
+import AlertBanner from "../components/UI/AlertBanner";
 
 export default function HomePage() {
   const {
@@ -18,9 +18,9 @@ export default function HomePage() {
   } = useApi(getDashboardStats, { autoFetch: true });
 
   return (
-    <main className="flex flex-col w-full max-w-7xl mx-auto">
+    <main className="flex-1 flex flex-col w-full max-w-7xl mx-auto">
       <AlertBanner message={error} onClose={() => setError(null)} />
-      <div className="my-auto bg-zinc-300 shadow-lg rounded-xl p-8 border">
+      <div className="my-auto bg-zinc-300 shadow-lg rounded-xl p-8 border border-zinc-400">
         <div className="flex justify-between">
           <p className="text-4xl">Front Desk Overview</p>
           <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded">
@@ -32,7 +32,7 @@ export default function HomePage() {
             Icon={CalendarDays}
             number={
               isLoading ? (
-                <Loader2 className="animate-spin" />
+                <Loader2 className="animate-spin text-zinc-400" size={28} />
               ) : (
                 stats.arrivals_today
               )

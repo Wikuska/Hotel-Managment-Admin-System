@@ -9,9 +9,9 @@ import { Routes, Route } from "react-router-dom";
 export default function App() {
   return (
     <NotificationProvider>
-      <div>
+      <div className="flex flex-col min-h-screen bg-zinc-100">
         <Navbar />
-        <div className="pt-20 bg-zinc-200 flex items-center justify-center min-h-screen">
+        <div className="grow flex flex-col p-4 sm:p-8 bg-zinc-200">
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/rooms" element={<RoomsPage />} />

@@ -2,12 +2,13 @@ import { useState } from "react";
 import { deleteGuest, getGuests } from "../api/guests";
 import { filterEntities, sortEntities } from "../utils/dataUtils";
 import { getApiError } from "../utils/errorHandler";
+import { Loader2 } from "lucide-react";
+import { useNotification } from "../components/UI/NotificationContext";
+import { useApi } from "../hooks/useApi";
 import GuestRow from "../components/guests/GuestRow";
 import GuestModal from "../components/guests/GuestModal";
 import AlertBanner from "../components/UI/AlertBanner";
 import Button from "../components/ui/Button";
-import { useNotification } from "../components/UI/NotificationContext";
-import { useApi } from "../hooks/useApi";
 
 export default function GuestsPage() {
   const {
@@ -65,58 +66,76 @@ export default function GuestsPage() {
     }
   };
 
-  if (loading) return <p>Loading guests...</p>;
   return (
-    <main className="flex flex-col w-full max-w-7xl mx-auto">
+    <main className="flex flex-col w-full max-w-7xl mx-auto pb-10">
       <AlertBanner message={error} onClose={() => setError(null)} />
-      <div className="flex justify-between pb-2">
-        <p className="text-4xl">Guests page</p>
-        <Button
-          onClick={() => {
-            handleOpenCreate();
-          }}
-          text="Add new guest"
-        />
+
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6">
+        <div>
+          <h1 className="text-4xl font-semibold text-zinc-800">Guests page</h1>
+          <p className="text-lg text-zinc-500 mt-2">
+            Update and delete guests data
+          </p>
+        </div>
+        <Button onClick={handleOpenCreate} text="Add new guest" />
       </div>
-      <p className="text-ml pb-7">Update and delete guests data</p>
-      <div className=" bg-white shadow-lg rounded-xl border border-gray-100 p-4">
-        <input
-          id="guest-search"
-          type="text"
-          placeholder="Find guest (name/last name)"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full border-zinc-200 border-2 rounded-xl p-1.5"
-        />
-      </div>
-      <div className=" bg-white shadow-lg rounded-xl border border-gray-100 p-4">
-        <div className="border-zinc-200 border-2 rounded-xl overflow-y-auto h-[50vh]">
-          <table className=" w-full ">
-            <thead className="bg-zinc-200 sticky top-0">
-              <tr>
-                <th className="p-3 text-left w-2/9">First and last name</th>
-                <th className="text-left w-2/9">E-mail</th>
-                <th className="text-left w-2/9">Phone</th>
-                <th className="text-left w-1/9"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-300">
-              {sortedGuests.map((guest) => (
-                <GuestRow
-                  key={guest.id}
-                  guest={guest}
-                  onDelete={() => {
-                    handleRemoveGuest(guest.id);
-                  }}
-                  onEdit={() => {
-                    handleOpenEdit(guest);
-                  }}
-                />
-              ))}
-            </tbody>
-          </table>
+
+      <div className="bg-white shadow-md rounded-2xl border border-zinc-200">
+        <div className="p-6 pb-4">
+          <input
+            id="guest-search"
+            type="text"
+            placeholder="Find guest (name/last name)..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full max-w-md border border-zinc-300 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+          />
+        </div>
+
+        <div className="px-6 pb-6">
+          <div className="border border-zinc-200 rounded-xl shadow-sm h-[60vh] overflow-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="bg-zinc-100 sticky top-0 text-zinc-600 font-medium z-10 border-b border-zinc-200">
+                <tr>
+                  <th className="p-4 w-1/3">First and last name</th>
+                  <th className="p-4 w-1/3">E-mail</th>
+                  <th className="p-4 w-1/4">Phone</th>
+                  <th className="p-4 w-24 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-200 bg-white">
+                {loading ? (
+                  <tr>
+                    <td colSpan="5" className="p-8 text-center text-zinc-500">
+                      <Loader2
+                        className="animate-spin inline-block mr-2 align-middle"
+                        size={20}
+                      />
+                      <span className="align-middle">Loading data...</span>
+                    </td>
+                  </tr>
+                ) : sortedGuests.length > 0 ? (
+                  sortedGuests.map((guest) => (
+                    <GuestRow
+                      key={guest.id}
+                      guest={guest}
+                      onDelete={() => handleRemoveGuest(guest.id)}
+                      onEdit={() => handleOpenEdit(guest)}
+                    />
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" className="p-8 text-center text-zinc-500">
+                      No guests found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
+
       {isModalOpen && (
         <GuestModal
           isOpen={true}
