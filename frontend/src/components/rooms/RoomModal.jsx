@@ -1,6 +1,6 @@
 import { useState } from "react";
+import { useApi } from "../../hooks/useApi";
 import { updateRoom, createRoom } from "../../api/rooms";
-import { getApiError } from "../../utils/errorHandler";
 import ModalWrapper from "../ui/ModalWrapper";
 import Button from "../ui/Button";
 import ModalInput from "../ui/ModalInput";
@@ -12,25 +12,29 @@ import {
 import { Alert } from "../UI/NotificationContext";
 
 export default function RoomModal({ isOpen, onClose, onRefresh, initialData }) {
-  const [error, setError] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isEditMode = !!initialData;
   const [selectedType, setSelectedType] = useState(
     initialData ? initialData.room_type : "single",
   );
-  const isEditMode = !!initialData;
-
   const currentRoomInfo = ROOM_TYPES.find(
     (type) => type.value === selectedType,
   );
   const currentCapacity = currentRoomInfo ? currentRoomInfo.capacity : 1;
 
+  const {
+    request: saveRoom,
+    loading: isSubmitting,
+    error,
+    setError,
+  } = useApi(
+    (data) =>
+      isEditMode ? updateRoom(initialData.id, data) : createRoom(data),
+    { showToast: false },
+  );
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setError(null);
-    setIsSubmitting(true);
-
-    const formData = new FormData(event.target);
-    const rawData = Object.fromEntries(formData);
+    const rawData = Object.fromEntries(new FormData(event.target));
 
     const data = {
       ...rawData,
@@ -38,19 +42,9 @@ export default function RoomModal({ isOpen, onClose, onRefresh, initialData }) {
       capacity: parseInt(rawData.capacity, 10),
     };
 
-    try {
-      if (isEditMode) {
-        await updateRoom(initialData.id, data);
-      } else {
-        await createRoom(data);
-      }
-
+    if (await saveRoom(data)) {
       onRefresh();
       onClose();
-    } catch (err) {
-      setError(getApiError(err));
-    } finally {
-      setIsSubmitting(false);
     }
   };
 

@@ -1,9 +1,14 @@
 import { useApi } from "../hooks/useApi";
+import { useState } from "react";
 import { CalendarDays, Bed, User, BookmarkX, Loader2 } from "lucide-react";
 import { getDashboardStats } from "../api/dashboard";
+import Button from "../components/ui/Button";
 import StatCard from "../components/ui/StatCard";
+import NewBookingModal from "../components/bookings/NewBookingModal";
 
 export default function HomePage() {
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+
   const {
     data: stats = {
       arrivals_today: 0,
@@ -12,6 +17,7 @@ export default function HomePage() {
       guests_in_house: 0,
     },
     loading: isLoading,
+    request: refreshStats,
   } = useApi(getDashboardStats, { autoFetch: true });
 
   return (
@@ -19,9 +25,10 @@ export default function HomePage() {
       <div className="my-auto bg-zinc-300 shadow-lg rounded-xl p-8 border border-zinc-400">
         <div className="flex justify-between">
           <p className="text-4xl">Front Desk Overview</p>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded">
-            New Reservation
-          </button>
+          <Button
+            text="New Booking"
+            onClick={() => setIsBookingModalOpen(true)}
+          />
         </div>
         <div className="grid grid-cols-4 gap-10 w-full p-10">
           <StatCard
@@ -73,6 +80,11 @@ export default function HomePage() {
           />
         </div>
       </div>
+      <NewBookingModal
+        isOpen={isBookingModalOpen}
+        onClose={() => setIsBookingModalOpen(false)}
+        onSuccess={refreshStats}
+      />
     </main>
   );
 }

@@ -1,10 +1,9 @@
 import ModalWrapper from "../ui/ModalWrapper";
 import Button from "../ui/Button";
 import ModalInput from "../ui/ModalInput";
-import { getApiError } from "../../utils/errorHandler";
-import { useState } from "react";
 import { createGuest, updateGuest } from "../../api/guests";
 import { Alert } from "../UI/NotificationContext";
+import { useApi } from "../../hooks/useApi";
 
 export default function GuestModal({
   isOpen,
@@ -12,31 +11,27 @@ export default function GuestModal({
   onRefresh,
   initialData,
 }) {
-  const [error, setError] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const isEditMode = !!initialData;
+
+  const {
+    request: saveGuest,
+    loading: isSubmitting,
+    error,
+    setError,
+  } = useApi(
+    (data) =>
+      isEditMode ? updateGuest(initialData.id, data) : createGuest(data),
+    { showToast: false },
+  );
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setError(null);
-    setIsSubmitting(true);
+    const data = Object.fromEntries(new FormData(event.target));
 
-    const formData = new FormData(event.target);
-    const data = Object.fromEntries(formData);
-
-    try {
-      if (isEditMode) {
-        await updateGuest(initialData.id, data);
-      } else {
-        await createGuest(data);
-      }
-
+    const result = await saveGuest(data);
+    if (result) {
       onRefresh();
       onClose();
-    } catch (err) {
-      setError(getApiError(err));
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
