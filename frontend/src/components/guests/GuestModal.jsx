@@ -1,10 +1,10 @@
 import ModalWrapper from "../ui/ModalWrapper";
 import Button from "../ui/Button";
 import ModalInput from "../ui/ModalInput";
-import AlertBanner from "../UI/AlertBanner";
 import { getApiError } from "../../utils/errorHandler";
 import { useState } from "react";
 import { createGuest, updateGuest } from "../../api/guests";
+import { Alert } from "../UI/NotificationContext";
 
 export default function GuestModal({
   isOpen,
@@ -47,7 +47,7 @@ export default function GuestModal({
       title={isEditMode ? "Edit guest informations" : "Add new guest"}
       maxWidth="max-w-xl"
     >
-      {error && <AlertBanner message={error} onClose={() => setError(null)} />}
+      {error && <Alert message={error} onClose={() => setError(null)} />}
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-2 grid-rows-2 gap-4">
           <ModalInput

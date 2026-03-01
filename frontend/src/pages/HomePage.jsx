@@ -2,7 +2,6 @@ import { useApi } from "../hooks/useApi";
 import { CalendarDays, Bed, User, BookmarkX, Loader2 } from "lucide-react";
 import { getDashboardStats } from "../api/dashboard";
 import StatCard from "../components/ui/StatCard";
-import AlertBanner from "../components/UI/AlertBanner";
 
 export default function HomePage() {
   const {
@@ -13,13 +12,10 @@ export default function HomePage() {
       guests_in_house: 0,
     },
     loading: isLoading,
-    error,
-    setError,
   } = useApi(getDashboardStats, { autoFetch: true });
 
   return (
     <main className="flex-1 flex flex-col w-full max-w-7xl mx-auto">
-      <AlertBanner message={error} onClose={() => setError(null)} />
       <div className="my-auto bg-zinc-300 shadow-lg rounded-xl p-8 border border-zinc-400">
         <div className="flex justify-between">
           <p className="text-4xl">Front Desk Overview</p>

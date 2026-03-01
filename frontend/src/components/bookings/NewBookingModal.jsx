@@ -6,7 +6,6 @@ import { useApi } from "../../hooks/useApi";
 
 import ModalWrapper from "../ui/ModalWrapper";
 import Button from "../ui/Button";
-import AlertBanner from "../UI/AlertBanner";
 
 import Step1Availability from "./wizard/Step1Availability";
 import Step2Rooms from "./wizard/Step2Rooms";
@@ -40,12 +39,8 @@ export default function NewBookingModal({ isOpen, onClose, onRefresh }) {
   const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
   const [availabilityError, setAvailabilityError] = useState("");
 
-  const {
-    request: submitBooking,
-    loading: isSubmitting,
-    error: submitError,
-    setError: setSubmitError,
-  } = useApi(createBooking);
+  const { request: submitBooking, loading: isSubmitting } =
+    useApi(createBooking);
 
   const { data: guests = [], request: fetchGuestsList } = useApi(getGuests);
 
@@ -145,8 +140,6 @@ export default function NewBookingModal({ isOpen, onClose, onRefresh }) {
       title="New Reservation"
       maxWidth="max-w-5xl"
     >
-      <AlertBanner message={submitError} onClose={() => setSubmitError(null)} />
-
       <Step1Availability
         checkInDate={checkInDate}
         checkOutDate={checkOutDate}

@@ -1,24 +1,21 @@
 import { useState } from "react";
 import { deleteGuest, getGuests } from "../api/guests";
 import { filterEntities, sortEntities } from "../utils/dataUtils";
-import { getApiError } from "../utils/errorHandler";
 import { Loader2 } from "lucide-react";
 import { useNotification } from "../components/UI/NotificationContext";
 import { useApi } from "../hooks/useApi";
 import GuestRow from "../components/guests/GuestRow";
 import GuestModal from "../components/guests/GuestModal";
-import AlertBanner from "../components/UI/AlertBanner";
 import Button from "../components/ui/Button";
 
 export default function GuestsPage() {
   const {
     data: guests,
     loading,
-    error,
-    setError,
     setData: setGuests,
     request: refreshGuests,
   } = useApi(getGuests, { autoFetch: true });
+  const { request: executeDeleteGuest } = useApi(deleteGuest);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedGuest, setSelectedGuest] = useState(null);
@@ -53,23 +50,20 @@ export default function GuestsPage() {
   const handleRemoveGuest = async (id) => {
     if (!confirm("Are you sure you want to delete guest?")) return;
 
-    setError(null);
     try {
-      await deleteGuest(id);
+      await executeDeleteGuest(id);
       setGuests((currentGuests) =>
         currentGuests.filter((guest) => guest.id != id),
       );
 
       showNotification("Guest deleted successfully", "success");
     } catch (err) {
-      setError(getApiError(err));
+      console.error("Action cancelled due to API error");
     }
   };
 
   return (
     <main className="flex flex-col w-full max-w-7xl mx-auto pb-10">
-      <AlertBanner message={error} onClose={() => setError(null)} />
-
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6">
         <div>
           <h1 className="text-4xl font-semibold text-zinc-800">Guests page</h1>

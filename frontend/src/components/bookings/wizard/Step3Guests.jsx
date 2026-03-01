@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { createGuest } from "../../../api/guests";
 import { useApi } from "../../../hooks/useApi";
+import { Alert } from "../../UI/NotificationContext";
 import Button from "../../ui/Button";
 import ModalInput from "../../ui/ModalInput";
-import AlertBanner from "../../UI/AlertBanner";
 
 export default function Step3Guests({
   guests,
@@ -19,7 +19,7 @@ export default function Step3Guests({
     loading: isSaving,
     error,
     setError,
-  } = useApi(createGuest);
+  } = useApi(createGuest, { showToast: false });
 
   const handleQuickSave = async (event) => {
     event.preventDefault();
@@ -39,7 +39,7 @@ export default function Step3Guests({
   if (isQuickAdd) {
     return (
       <div className="border-blue-200 border-2 bg-blue-50/30 rounded-xl p-5 mt-4">
-        <AlertBanner message={error} onClose={() => setError(null)} />
+        {error && <Alert message={error} onClose={() => setError(null)} />}
         <span className="text-xl font-bold text-gray-900">
           Quick Add New Guest
         </span>

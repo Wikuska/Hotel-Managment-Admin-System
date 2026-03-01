@@ -7,7 +7,6 @@ import { filterByAllowedValues } from "../utils/dataUtils";
 import Button from "../components/ui/Button";
 import BookingRow from "../components/bookings/BookingRow";
 import NewBookingModal from "../components/bookings/NewBookingModal";
-import AlertBanner from "../components/UI/AlertBanner";
 
 export default function BookingsPage() {
   const [activeTab, setActiveTab] = useState("active");
@@ -23,8 +22,6 @@ export default function BookingsPage() {
   const {
     data: bookings = [],
     loading,
-    error,
-    setError,
     request: refreshBookings,
   } = useApi(getBookings, { autoFetch: true });
 
@@ -39,8 +36,6 @@ export default function BookingsPage() {
 
   return (
     <main className="flex flex-col w-full max-w-7xl mx-auto pb-10">
-      <AlertBanner message={error} onClose={() => setError(null)} />
-
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6">
         <div>
           <h1 className="text-4xl font-semibold text-zinc-800">Bookings</h1>

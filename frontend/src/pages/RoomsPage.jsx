@@ -6,7 +6,6 @@ import { useNotification } from "../components/UI/NotificationContext";
 import { Loader2 } from "lucide-react";
 import RoomRow from "../components/rooms/RoomRow";
 import RoomModal from "../components/rooms/RoomModal";
-import AlertBanner from "../components/UI/AlertBanner";
 import Button from "../components/ui/Button";
 
 export default function RoomsPage() {
@@ -18,8 +17,6 @@ export default function RoomsPage() {
   const {
     data: rooms,
     loading,
-    error,
-    setError,
     request: refreshRooms,
   } = useApi(getRooms, { autoFetch: true });
 
@@ -46,8 +43,6 @@ export default function RoomsPage() {
 
   return (
     <main className="flex flex-col w-full max-w-7xl mx-auto pb-10">
-      <AlertBanner message={error} onClose={() => setError(null)} />
-
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6">
         <div>
           <h1 className="text-4xl font-semibold text-zinc-800">Rooms page</h1>
