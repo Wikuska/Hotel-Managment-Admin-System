@@ -1,3 +1,4 @@
+from typing import Optional
 from datetime import date, datetime
 from pydantic import BaseModel
 import enum
@@ -44,3 +45,10 @@ class BookingRead(BaseModel):
 
     class Config:
         from_attributes = True
+        
+class BookingUpdate(BaseModel):
+    room_id: Optional[int] = None
+    guest_id: Optional[int] = None
+    date_from: Optional[date] = None
+    date_to: Optional[date] = None
+    status: Optional[BookingStatusEnum] = None

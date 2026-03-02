@@ -2,7 +2,7 @@ from datetime import date
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from app.models import Room, Guest, Booking
-from app.schemas import RoomCreate, GuestCreate, BookingCreate, BookingStatusEnum, GuestUpdate
+from app.schemas import RoomCreate, GuestCreate, BookingCreate, BookingStatusEnum, GuestUpdate, BookingUpdate
 
 # -- ROOMS --
 
@@ -75,16 +75,24 @@ def update_guest(db:Session, guest:Guest, guest_data:GuestUpdate):
 def get_bookings(db: Session):
     return db.query(Booking).all()
 
-def is_room_available(db: Session, room_id: int, date_from: date, date_to: date):
+def get_booking(db: Session, booking_id: int):
+    return db.query(Booking).filter(Booking.id == booking_id).first()
+
+def is_room_available(db: Session, room_id: int, date_from: date, date_to: date, exclude_booking_id: int | None = None):
     
-    conflict = (
+    query = (
         db.query(Booking)
         .filter(Booking.room_id == room_id)
         .filter(Booking.status.in_([BookingStatusEnum.CONFIRMED.value, BookingStatusEnum.CHECKED_IN.value])) 
         .filter(date_from < Booking.date_to)
         .filter(date_to > Booking.date_from)
-        .first()
     )
+    
+    if exclude_booking_id is not None:
+        query = query.filter(Booking.id != exclude_booking_id)
+        
+    conflict = query.first()
+    
     return conflict is None
 
 def create_booking(db:Session, booking_data:BookingCreate):
@@ -100,14 +108,18 @@ def create_booking(db:Session, booking_data:BookingCreate):
         db.rollback()
         return None
 
-def cancel_booking(db: Session, booking_id: int):
-    booking = db.query(Booking).filter(Booking.id == booking_id).first()
-    if not booking:
-        return False
-    
-    booking.status = "cancelled"
-    db.commit()
-    return True
+def update_booking(db:Session, booking:Booking, booking_data:BookingUpdate):
+    update_data = booking_data.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(booking, key, value)
+        
+    try:
+        db.commit()
+        db.refresh(booking)
+        return booking
+    except IntegrityError:
+        db.rollback()
+        return None
 
 
 # -- STATS --

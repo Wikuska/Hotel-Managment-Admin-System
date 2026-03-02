@@ -10,3 +10,10 @@ export function createBooking(payload) {
     body: JSON.stringify(payload),
   });
 }
+
+export function updateBooking(bookingId, payload) {
+  return api(`/bookings/${bookingId}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}

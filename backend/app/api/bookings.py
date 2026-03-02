@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.db.deps import get_db
-from app.schemas.booking import BookingCreate, BookingRead
+from app.schemas.booking import BookingCreate, BookingRead, BookingUpdate
 from app import crud
 
 router = APIRouter(prefix="/bookings", tags=["bookings"])
@@ -39,10 +39,29 @@ def create_booking(data: BookingCreate, db: Session = Depends(get_db)):
         
     return booking
 
-@router.post("/{booking_id}/cancel")
-def cancel_booking(booking_id: int, db: Session = Depends(get_db)):
-    success = crud.cancel_booking(db, booking_id)
-    if not success:
+@router.patch("/{booking_id}", response_model=BookingRead)
+def update_booking(booking_id: int, data: BookingUpdate, db: Session = Depends(get_db)):
+    
+    db_booking = crud.get_booking(db, booking_id)
+    if not db_booking:
         raise HTTPException(status_code=404, detail="Booking not found")
     
-    return {"cancelled": True}
+    if not crud.is_room_available(
+        db, 
+        data.room_id if data.room_id is not None else db_booking.room_id, 
+        data.date_from if data.date_from is not None else db_booking.date_from, 
+        data.date_to if data.date_to is not None else db_booking.date_to,
+        exclude_booking_id=booking_id
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Room is already booked in this date range"
+        )
+    
+    updated_booking = crud.update_booking(db, db_booking, data)
+    if not updated_booking:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to update booking"
+        )
+    return updated_booking
