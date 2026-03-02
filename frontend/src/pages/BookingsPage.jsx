@@ -11,6 +11,7 @@ import NewBookingModal from "../components/bookings/NewBookingModal";
 export default function BookingsPage() {
   const [activeTab, setActiveTab] = useState("active");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
   const { showNotification } = useNotification();
 
   const TAB_STATUSES = {
@@ -29,9 +30,23 @@ export default function BookingsPage() {
     ? filterByAllowedValues(bookings, "status", TAB_STATUSES[activeTab])
     : bookings;
 
+  const handleCreateBooking = () => {
+    setSelectedBooking(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEditBooking = (booking) => {
+    setSelectedBooking(booking);
+    setIsModalOpen(true);
+  };
+
   const handleSuccess = () => {
     refreshBookings();
-    showNotification("Reservation successfully created!", "success");
+    showNotification(
+      selectedBooking
+        ? "Booking updated successfully!"
+        : "Booking created successfully!",
+    );
   };
 
   return (
@@ -43,10 +58,7 @@ export default function BookingsPage() {
             Manage guest reservations and check-ins
           </p>
         </div>
-        <Button
-          text="Create new reservation"
-          onClick={() => setIsModalOpen(true)}
-        />
+        <Button text="Create new reservation" onClick={handleCreateBooking} />
       </div>
 
       <div className="bg-white shadow-md rounded-2xl border border-zinc-200">
@@ -94,7 +106,11 @@ export default function BookingsPage() {
                   </tr>
                 ) : bookingsInTab?.length > 0 ? (
                   bookingsInTab.map((booking) => (
-                    <BookingRow key={booking.id} booking={booking} />
+                    <BookingRow
+                      key={booking.id}
+                      booking={booking}
+                      onEdit={() => handleEditBooking(booking)}
+                    />
                   ))
                 ) : (
                   <tr>
@@ -114,6 +130,7 @@ export default function BookingsPage() {
           isOpen={true}
           onClose={() => setIsModalOpen(false)}
           onRefresh={handleSuccess}
+          initialData={selectedBooking}
         />
       )}
     </main>

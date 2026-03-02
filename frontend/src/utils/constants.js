@@ -69,12 +69,6 @@ export const ROOM_STATUSES = [
     color:
       "bg-gray-100 text-gray-800 border border-gray-200 px-3 py-1 rounded-full",
   },
-  {
-    value: "cleaning",
-    label: "Cleaning",
-    color:
-      "bg-blue-100 text-blue-800 border border-blue-200 px-3 py-1 rounded-full",
-  },
 ];
 
 export const BOOKING_STATUSES = [

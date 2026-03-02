@@ -4,11 +4,21 @@ import { ROOM_TYPES } from "./constants";
 /**
  * Check if a room is available for the given date range
  */
-export async function isRoomAvailable(roomId, checkIn, checkOut, bookings) {
+export async function isRoomAvailable(
+  roomId,
+  checkIn,
+  checkOut,
+  bookings,
+  excludeBookingId = null,
+) {
   const checkInDate = new Date(checkIn);
   const checkOutDate = new Date(checkOut);
 
   return !bookings.some((booking) => {
+    if (excludeBookingId && String(booking.id) === String(excludeBookingId)) {
+      return false;
+    }
+
     if (booking.room_id !== roomId) {
       return false;
     }
@@ -23,7 +33,13 @@ export async function isRoomAvailable(roomId, checkIn, checkOut, bookings) {
 /**
  * Fetch all bookings and filter available rooms by capacity match and date range
  */
-export async function getAvailableRooms(rooms, checkIn, checkOut, guestCount) {
+export async function getAvailableRooms(
+  rooms,
+  checkIn,
+  checkOut,
+  guestCount,
+  excludeBookingId = null,
+) {
   try {
     const bookings = await getBookings();
     const availableRooms = [];
@@ -37,6 +53,7 @@ export async function getAvailableRooms(rooms, checkIn, checkOut, guestCount) {
         checkIn,
         checkOut,
         bookings,
+        excludeBookingId,
       );
       if (available) {
         availableRooms.push(room);

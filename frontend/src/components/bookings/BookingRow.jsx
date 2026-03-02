@@ -1,7 +1,7 @@
 import { NotebookPen, DoorOpen } from "lucide-react";
 import { BOOKING_STATUSES } from "../../utils/constants";
 
-export default function BookingRow({ booking }) {
+export default function BookingRow({ booking, onEdit }) {
   const statusConfig = BOOKING_STATUSES.find((s) => s.value === booking.status);
 
   return (
@@ -24,6 +24,7 @@ export default function BookingRow({ booking }) {
       <td className="p-3">
         <div className="flex items-center justify-end gap-4">
           <button
+            onClick={onEdit}
             className="cursor-pointer text-zinc-500 hover:text-green-600 transition-colors duration-200"
             title="Edit booking"
           >
