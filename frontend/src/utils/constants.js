@@ -104,7 +104,7 @@ export const BOOKING_STATUSES = [
   },
 ];
 
-export const ACTIONS_BY_STATUS = {
+export const BOOKINGS_ACTIONS_BY_STATUS = {
   confirmed: {
     checkIn: true,
     checkOut: false,
@@ -139,5 +139,29 @@ export const ACTIONS_BY_STATUS = {
     cancel: false,
     noShow: false,
     edit: false,
+  },
+};
+
+export const ROOMS_ACTIONS_BY_STATUS = {
+  available: {
+    markDirty: true,
+    startMaintenance: true,
+    edit: true,
+    details: true,
+  },
+  occupied: {
+    edit: true,
+    details: true,
+  },
+  dirty: {
+    markClean: true,
+    startMaintenance: true,
+    edit: true,
+    details: true,
+  },
+  maintenance: {
+    endMaintenance: true,
+    edit: true,
+    details: true,
   },
 };

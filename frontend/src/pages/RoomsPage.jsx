@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getRooms } from "../api/rooms";
+import { getRooms, updateRoom } from "../api/rooms";
 import { sortEntities } from "../utils/dataUtils";
 import { useApi } from "../hooks/useApi";
 import { useNotification } from "../components/UI/NotificationContext";
@@ -8,17 +8,23 @@ import RoomRow from "../components/rooms/RoomRow";
 import RoomModal from "../components/rooms/RoomModal";
 import Button from "../components/ui/Button";
 
+const ROOM_STATUS_MESSAGES = {
+  dirty: "Room marked as dirty.",
+  available: "Room marked as available.",
+  maintenance: "Room set to maintenance.",
+};
+
 export default function RoomsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
   const { showNotification } = useNotification();
-
   const {
     data: rooms,
     loading,
     request: refreshRooms,
   } = useApi(getRooms, { autoFetch: true });
+  const { request: executeUpdateRoom } = useApi(updateRoom);
 
   const sortedRooms = sortEntities(rooms, "number", sortOrder);
 
@@ -30,6 +36,14 @@ export default function RoomsPage() {
   const handleOpenEdit = (room) => {
     setSelectedRoom(room);
     setIsModalOpen(true);
+  };
+
+  const changeRoomStatus = async (roomId, room_status) => {
+    try {
+      await executeUpdateRoom(roomId, { room_status });
+      showNotification(ROOM_STATUS_MESSAGES[room_status] ?? "Room updated.");
+      refreshRooms();
+    } catch {}
   };
 
   const handleSuccess = () => {
@@ -96,6 +110,7 @@ export default function RoomsPage() {
                       key={room.id}
                       room={room}
                       onEdit={() => handleOpenEdit(room)}
+                      onStatusChange={changeRoomStatus}
                     />
                   ))
                 ) : (

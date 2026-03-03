@@ -46,7 +46,7 @@ def validate_room_status_transition(db: Session, room: Room, new_status: str):
 
     allowed = {
         RoomStatusEnum.DIRTY.value: {RoomStatusEnum.AVAILABLE.value, RoomStatusEnum.MAINTENANCE.value},
-        RoomStatusEnum.AVAILABLE.value: {RoomStatusEnum.MAINTENANCE.value},
+        RoomStatusEnum.AVAILABLE.value: {RoomStatusEnum.DIRTY.value, RoomStatusEnum.MAINTENANCE.value},
         RoomStatusEnum.MAINTENANCE.value: {RoomStatusEnum.AVAILABLE.value},
         RoomStatusEnum.OCCUPIED.value: set(),
     }
