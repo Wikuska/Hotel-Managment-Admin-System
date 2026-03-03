@@ -30,7 +30,7 @@ def create_guest(data: GuestCreate, db: Session = Depends(get_db)):
 def update_guest(guest_id: int, data: GuestUpdate, db: Session = Depends(get_db)):
     db_guest = crud.get_guest(db, guest_id)
     if not db_guest:
-        raise HTTPException(status_code=404, detail="Guest not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Guest not found")
     
     updated_guest = crud.update_guest(db, db_guest, data)
     
@@ -44,7 +44,7 @@ def update_guest(guest_id: int, data: GuestUpdate, db: Session = Depends(get_db)
 def delete_guest(guest_id: int, db: Session = Depends(get_db)):
     db_guest = crud.get_guest(db, guest_id)
     if not db_guest:
-        raise HTTPException(status_code=404, detail="Giest not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Guest not found")
     
     try:
         db.delete(db_guest)
@@ -52,7 +52,7 @@ def delete_guest(guest_id: int, db: Session = Depends(get_db)):
         
     except IntegrityError:
         db.rollback()
-        raise HTTPException(status_code=409, detail="Cannot delete guest linked to active booking")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Cannot delete guest linked to active booking")
     
     return Response(status_code=status.HTTP_204_NO_CONTENT)
         

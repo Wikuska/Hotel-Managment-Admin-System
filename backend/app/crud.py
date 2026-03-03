@@ -2,7 +2,7 @@ from datetime import date
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from app.models import Room, Guest, Booking
-from app.schemas import RoomCreate, GuestCreate, BookingCreate, BookingStatusEnum, GuestUpdate, BookingUpdate
+from app.schemas import RoomCreate, GuestCreate, BookingCreate, BookingStatusEnum, GuestUpdate, BookingUpdate, RoomUpdate, RoomStatusEnum
 from app.services.booking_rules import validate_booking_status_transition, apply_room_status_after_booking_status_change
 
 # -- ROOMS --
@@ -23,19 +23,58 @@ def create_room(db: Session, room_data: RoomCreate):
     except IntegrityError:
         db.rollback()
         return None
-    
-def update_room(db:Session, room:Room, room_data:RoomCreate):
+
+def has_active_checked_in_booking(db: Session, room_id: int):
+    return (
+        db.query(Booking)
+        .filter(Booking.room_id == room_id)
+        .filter(Booking.status == BookingStatusEnum.CHECKED_IN.value)
+        .first()
+        is not None
+    )
+
+def validate_room_status_transition(db: Session, room: Room, new_status: str):
+    old_status = room.room_status
+    if new_status == old_status:
+        return True, None
+
+    if new_status == RoomStatusEnum.OCCUPIED.value:
+        return False, "Room status 'occupied' is controlled by bookings (check-in)."
+
+    if has_active_checked_in_booking(db, room.id):
+        return False, "Cannot change room status while a guest is checked in."
+
+    allowed = {
+        RoomStatusEnum.DIRTY.value: {RoomStatusEnum.AVAILABLE.value, RoomStatusEnum.MAINTENANCE.value},
+        RoomStatusEnum.AVAILABLE.value: {RoomStatusEnum.MAINTENANCE.value},
+        RoomStatusEnum.MAINTENANCE.value: {RoomStatusEnum.AVAILABLE.value},
+        RoomStatusEnum.OCCUPIED.value: set(),
+    }
+
+    if new_status not in allowed.get(old_status, set()):
+        return False, f"Invalid room status transition: {old_status} -> {new_status}"
+
+    return True, None
+
+def update_room(db:Session, room:Room, room_data:RoomUpdate):
     update_data = room_data.model_dump(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(room, key, value)
-        
+    
+    if "room_status" in update_data:
+        ok, msg = validate_room_status_transition(db, room, update_data["room_status"])
+        if not ok:
+            return None, "invalid_transition", msg
+
     try:
+        for key, value in update_data.items():
+            setattr(room, key, value)
+
         db.commit()
         db.refresh(room)
-        return room
+        return room, None, None
+
     except IntegrityError:
         db.rollback()
-        return None
+        return None, "db_error", "Room with this number already exists."
 
 
 # -- GUESTS --

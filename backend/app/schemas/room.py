@@ -34,3 +34,10 @@ class RoomRead(BaseModel):
 
     class Config:
         from_attributes = True
+        
+class RoomUpdate(BaseModel):
+    number: str | None = None
+    floor: int | None = None
+    capacity: int | None = None
+    room_type: RoomTypeEnum | None = None
+    room_status: RoomStatusEnum | None = None

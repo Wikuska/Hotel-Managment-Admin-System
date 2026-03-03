@@ -1,6 +1,5 @@
 from app.schemas import BookingStatusEnum, RoomStatusEnum
-from app.models import Booking, Room
-from sqlalchemy.exc import IntegrityError
+from app.models import Room
 from sqlalchemy.orm import Session
 
 def validate_booking_status_transition(old_status: str, new_status: str):

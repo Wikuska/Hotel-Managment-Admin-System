@@ -6,6 +6,7 @@ export default function ModalInput({
   input_name,
   additional_style = "",
   required = true,
+  readOnly = false,
   ...props
 }) {
   return (
@@ -19,7 +20,11 @@ export default function ModalInput({
           type={input_type}
           name={input_name}
           required={required}
-          className={`${MODAL_INPUT_CLASS} ${additional_style}`}
+          readOnly={readOnly}
+          className={`
+            ${MODAL_INPUT_CLASS} 
+            ${readOnly ? "bg-zinc-50 text-zinc-600 cursor-default focus:ring-0 focus:outline-none" : ""} 
+            ${additional_style}`}
           {...props}
         />
       </div>

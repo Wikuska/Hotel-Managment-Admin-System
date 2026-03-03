@@ -13,7 +13,7 @@ export function createRoom(payload) {
 
 export function updateRoom(id, payload) {
   return api(`/rooms/${id}`, {
-    method: "PUT",
+    method: "PATCH",
     body: JSON.stringify(payload),
   });
 }

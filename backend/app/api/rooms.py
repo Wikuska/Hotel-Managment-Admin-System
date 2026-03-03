@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from typing import List
 
 from app.db.deps import get_db
-from app.schemas import RoomCreate, RoomRead
+from app.schemas import RoomCreate, RoomRead, RoomUpdate
 from app import crud
 
 router = APIRouter(prefix="/rooms", tags=["rooms"])
@@ -18,36 +18,39 @@ def create_room(data: RoomCreate, db: Session = Depends(get_db)):
     room = crud.create_room(db, data)
     if room is None:
         raise HTTPException(
-            status_code=409,
+            status_code=status.HTTP_409_CONFLICT,
             detail="Room number must be unique"
         )
     return room
 
-@router.put("/{room_id}", response_model=RoomRead)
-def update_room(room_id: int, data: RoomCreate, db: Session = Depends(get_db)):
+@router.patch("/{room_id}", response_model=RoomRead)
+def update_room(room_id: int, data: RoomUpdate, db: Session = Depends(get_db)):
     db_room = crud.get_room(db, room_id)
     if not db_room:
-        raise HTTPException(status_code=404, detail="Room not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Room not found")
     
-    updated_room = crud.update_room(db, db_room, data)
-    
-    if not updated_room:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
-            detail="Room with this number already exists.")
-    
+    updated_room, err, msg = crud.update_room(db, db_room, data)
+
+    if err == "invalid_transition":
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=msg)
+    if err == "db_error":
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=msg)
+    if updated_room is None:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Failed to update room")
+
     return updated_room
 
 @router.delete("/{room_id}")
 def delete_room(room_id: int, db: Session = Depends(get_db)):
     db_room = crud.get_room(db, room_id)
     if not db_room:
-        raise HTTPException(status_code=404, detail="Room not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Room not found")
     try:
         db.delete(db_room)
         db.commit()
     
     except IntegrityError:
         db.rollback()
-        raise HTTPException(status_code=409, detail="Cannot delete room linked to active booking")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Cannot delete room linked to active booking")
     
     return Response(status_code=status.HTTP_204_NO_CONTENT)

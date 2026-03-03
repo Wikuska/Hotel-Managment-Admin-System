@@ -16,12 +16,12 @@ def get_bookings(db: Session = Depends(get_db)):
 def create_booking(data: BookingCreate, db: Session = Depends(get_db)):
     
     if data.date_to <= data.date_from:
-        raise HTTPException(status_code=400, detail="Check out date must be after check in date")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Check out date must be after check in date")
 
     if not crud.get_room(db, data.room_id):
-        raise HTTPException(status_code=404, detail="Room not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Room not found")
     if not crud.get_guest(db, data.guest_id):
-        raise HTTPException(status_code=404, detail="Guest not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Guest not found")
 
     if not crud.is_room_available(db, data.room_id, data.date_from, data.date_to):
         raise HTTPException(
@@ -44,7 +44,7 @@ def update_booking(booking_id: int, data: BookingUpdate, db: Session = Depends(g
     
     db_booking = crud.get_booking(db, booking_id)
     if not db_booking:
-        raise HTTPException(status_code=404, detail="Booking not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Booking not found")
     
     new_room_id = data.room_id if data.room_id is not None else db_booking.room_id
     new_date_from = data.date_from if data.date_from is not None else db_booking.date_from
@@ -70,10 +70,9 @@ def update_booking(booking_id: int, data: BookingUpdate, db: Session = Depends(g
     updated_booking, err, msg = crud.update_booking(db, db_booking, data)
 
     if err == "invalid_transition":
-        raise HTTPException(status_code=422, detail=msg)
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=msg)
     if err == "room_error":
-        raise HTTPException(status_code=409, detail=msg)
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=msg)
     if err == "db_error" or updated_booking is None:
-        raise HTTPException(status_code=500, detail="Failed to update booking")
-
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Failed to update booking")
     return updated_booking
