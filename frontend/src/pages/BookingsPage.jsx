@@ -8,6 +8,13 @@ import Button from "../components/ui/Button";
 import BookingRow from "../components/bookings/BookingRow";
 import NewBookingModal from "../components/bookings/NewBookingModal";
 
+const BOOKING_STATUS_MESSAGES = {
+  checked_in: "Guest checked in successfully!",
+  checked_out: "Guest checked out successfully!",
+  cancelled: "Booking cancelled successfully.",
+  no_show: "Booking marked as no-show.",
+};
+
 export default function BookingsPage() {
   const [activeTab, setActiveTab] = useState("active");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,11 +36,11 @@ export default function BookingsPage() {
     ? filterByAllowedValues(bookings, "status", TAB_STATUSES[activeTab])
     : bookings;
 
-  const changeStatus = async (bookingId, status, message) => {
+  const changeStatus = async (bookingId, status) => {
     try {
       await executeUpdateBooking(bookingId, { status });
-      showNotification(message);
       refreshBookings();
+      showNotification(BOOKING_STATUS_MESSAGES[status] ?? "Updated");
     } catch {}
   };
 
@@ -44,18 +51,6 @@ export default function BookingsPage() {
   const handleEditBooking = (booking) => {
     setSelectedBooking(booking);
     setIsModalOpen(true);
-  };
-  const handleCheckIn = (id) => {
-    changeStatus(id, "checked_in", "Guest checked in successfully!");
-  };
-  const handleCheckOut = (id) => {
-    changeStatus(id, "checked_out", "Guest checked out successfully!");
-  };
-  const handleCancel = (id) => {
-    changeStatus(id, "cancelled", "Booking cancelled successfully.");
-  };
-  const handleNoShow = (id) => {
-    changeStatus(id, "no_show", "Booking marked as no-show.");
   };
 
   const handleSuccess = () => {
@@ -128,10 +123,7 @@ export default function BookingsPage() {
                       key={booking.id}
                       booking={booking}
                       onEdit={() => handleEditBooking(booking)}
-                      onCheckIn={() => handleCheckIn(booking.id)}
-                      onCheckOut={() => handleCheckOut(booking.id)}
-                      onCancel={() => handleCancel(booking.id)}
-                      onNoShow={() => handleNoShow(booking.id)}
+                      onStatusChange={changeStatus}
                     />
                   ))
                 ) : (

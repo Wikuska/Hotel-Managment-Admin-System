@@ -6,18 +6,15 @@ import {
   XCircle,
   UserX,
 } from "lucide-react";
-import { BOOKING_STATUSES, ACTIONS_BY_STATUS } from "../../utils/constants";
+import Button from "../ui/Button";
+import {
+  BOOKING_STATUSES,
+  BOOKINGS_ACTIONS_BY_STATUS,
+} from "../../utils/constants";
 
-export default function BookingRow({
-  booking,
-  onEdit,
-  onCheckIn,
-  onCheckOut,
-  onCancel,
-  onNoShow,
-}) {
+export default function BookingRow({ booking, onEdit, onStatusChange }) {
   const statusConfig = BOOKING_STATUSES.find((s) => s.value === booking.status);
-  const actions = ACTIONS_BY_STATUS[booking.status] ?? {};
+  const actions = BOOKINGS_ACTIONS_BY_STATUS[booking.status] ?? {};
 
   return (
     <tr className="hover:bg-zinc-50 transition-colors border-b border-zinc-200 last:border-0">
@@ -39,49 +36,54 @@ export default function BookingRow({
       <td className="p-3">
         <div className="flex items-center justify-end gap-4">
           {actions.checkIn && (
-            <button
-              onClick={() => onCheckIn(booking.id)}
-              className="cursor-pointer text-zinc-500 hover:text-green-600 transition-colors duration-200"
+            <Button
+              onClick={() => onStatusChange(booking.id, "checked_in")}
+              variant="icon"
               title="Check-in"
+              additional_style="hover:text-green-600"
             >
               <LogIn size={20} />
-            </button>
+            </Button>
           )}
           {actions.checkOut && (
-            <button
-              onClick={() => onCheckOut(booking.id)}
-              className="cursor-pointer text-zinc-500 hover:text-blue-600 transition-colors duration-200"
+            <Button
+              onClick={() => onStatusChange(booking.id, "checked_out")}
+              variant="icon"
+              additional_style="hover:text-blue-600"
               title="Check-out"
             >
               <LogOut size={20} />
-            </button>
+            </Button>
           )}
           {actions.cancel && (
-            <button
-              onClick={() => onCancel(booking.id)}
-              className="cursor-pointer text-zinc-500 hover:text-red-600 transition-colors duration-200"
+            <Button
+              onClick={() => onStatusChange(booking.id, "cancelled")}
+              variant="icon"
+              additional_style="hover:text-red-600"
               title="Cancel booking"
             >
               <XCircle size={20} />
-            </button>
+            </Button>
           )}
           {actions.noShow && (
-            <button
-              onClick={() => onNoShow(booking.id)}
-              className="cursor-pointer text-zinc-500 hover:text-orange-600 transition-colors duration-200"
+            <Button
+              onClick={() => onStatusChange(booking.id, "no_show")}
+              variant="icon"
+              additional_style="hover:text-orange-600"
               title="No show"
             >
               <UserX size={20} />
-            </button>
+            </Button>
           )}
           {actions.edit && (
-            <button
+            <Button
               onClick={() => onEdit(booking)}
-              className="cursor-pointer text-zinc-500 hover:text-green-600 transition-colors duration-200"
+              variant="icon"
+              additional_style="hover:text-green-600"
               title="Edit booking"
             >
               <NotebookPen size={20} />
-            </button>
+            </Button>
           )}
         </div>
       </td>
