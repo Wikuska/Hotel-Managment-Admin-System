@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from app.models import Room, Guest, Booking
 from app.schemas import RoomCreate, GuestCreate, BookingCreate, BookingStatusEnum, GuestUpdate, BookingUpdate
+from app.services.booking_rules import validate_booking_status_transition, apply_room_status_after_booking_status_change
 
 # -- ROOMS --
 
@@ -110,16 +111,32 @@ def create_booking(db:Session, booking_data:BookingCreate):
 
 def update_booking(db:Session, booking:Booking, booking_data:BookingUpdate):
     update_data = booking_data.model_dump(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(booking, key, value)
-        
+    
+    old_status = booking.status
+    new_status = update_data.get("status", old_status)
+    
+    if "status" in update_data:
+        ok, msg = validate_booking_status_transition(old_status, new_status)
+        if not ok:
+            return None, "invalid_transition", msg
+    
     try:
+        for key, value in update_data.items():
+            setattr(booking, key, value)
+
+        if "status" in update_data and new_status != old_status:
+            ok, msg = apply_room_status_after_booking_status_change(db, booking.room_id, new_status)
+            if not ok:
+                db.rollback()
+                return None, "room_error", msg
+
         db.commit()
         db.refresh(booking)
-        return booking
+        return booking, None, None
+
     except IntegrityError:
         db.rollback()
-        return None
+        return None, "db_error", "Database error"
 
 
 # -- STATS --

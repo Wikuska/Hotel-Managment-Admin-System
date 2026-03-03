@@ -46,22 +46,34 @@ def update_booking(booking_id: int, data: BookingUpdate, db: Session = Depends(g
     if not db_booking:
         raise HTTPException(status_code=404, detail="Booking not found")
     
-    if not crud.is_room_available(
-        db, 
-        data.room_id if data.room_id is not None else db_booking.room_id, 
-        data.date_from if data.date_from is not None else db_booking.date_from, 
-        data.date_to if data.date_to is not None else db_booking.date_to,
-        exclude_booking_id=booking_id
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Room is already booked in this date range"
-        )
+    new_room_id = data.room_id if data.room_id is not None else db_booking.room_id
+    new_date_from = data.date_from if data.date_from is not None else db_booking.date_from
+    new_date_to = data.date_to if data.date_to is not None else db_booking.date_to
     
-    updated_booking = crud.update_booking(db, db_booking, data)
-    if not updated_booking:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to update booking"
-        )
+    if (
+        data.room_id is not None
+        or data.date_from is not None
+        or data.date_to is not None
+    ):
+        if not crud.is_room_available(
+            db, 
+            new_room_id, 
+            new_date_from,
+            new_date_to,
+            exclude_booking_id=booking_id
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Room is already booked in this date range"
+            )
+    
+    updated_booking, err, msg = crud.update_booking(db, db_booking, data)
+
+    if err == "invalid_transition":
+        raise HTTPException(status_code=422, detail=msg)
+    if err == "room_error":
+        raise HTTPException(status_code=409, detail=msg)
+    if err == "db_error" or updated_booking is None:
+        raise HTTPException(status_code=500, detail="Failed to update booking")
+
     return updated_booking
