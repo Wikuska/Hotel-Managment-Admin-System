@@ -103,3 +103,41 @@ export const BOOKING_STATUSES = [
       "bg-purple-100 text-purple-800 border border-purple-200 px-3 py-1 rounded-full",
   },
 ];
+
+export const ACTIONS_BY_STATUS = {
+  confirmed: {
+    checkIn: true,
+    checkOut: false,
+    cancel: true,
+    noShow: true,
+    edit: true,
+  },
+  checked_in: {
+    checkIn: false,
+    checkOut: true,
+    cancel: false,
+    noShow: false,
+    edit: true,
+  },
+  checked_out: {
+    checkIn: false,
+    checkOut: false,
+    cancel: false,
+    noShow: false,
+    edit: false,
+  },
+  cancelled: {
+    checkIn: false,
+    checkOut: false,
+    cancel: false,
+    noShow: false,
+    edit: false,
+  },
+  no_show: {
+    checkIn: false,
+    checkOut: false,
+    cancel: false,
+    noShow: false,
+    edit: false,
+  },
+};

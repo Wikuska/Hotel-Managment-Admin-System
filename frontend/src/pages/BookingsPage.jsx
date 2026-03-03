@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getBookings } from "../api/bookings";
+import { getBookings, updateBooking } from "../api/bookings";
 import { useNotification } from "../components/UI/NotificationContext";
 import { Loader2 } from "lucide-react";
 import { useApi } from "../hooks/useApi";
@@ -13,31 +13,49 @@ export default function BookingsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const { showNotification } = useNotification();
-
   const TAB_STATUSES = {
     active: ["confirmed", "checked_in"],
     archived: ["checked_out", "cancelled", "no_show"],
     all: null,
   };
-
   const {
     data: bookings = [],
     loading,
     request: refreshBookings,
   } = useApi(getBookings, { autoFetch: true });
+  const { request: executeUpdateBooking } = useApi(updateBooking);
 
   const bookingsInTab = TAB_STATUSES[activeTab]
     ? filterByAllowedValues(bookings, "status", TAB_STATUSES[activeTab])
     : bookings;
 
+  const changeStatus = async (bookingId, status, message) => {
+    try {
+      await executeUpdateBooking(bookingId, { status });
+      showNotification(message);
+      refreshBookings();
+    } catch {}
+  };
+
   const handleCreateBooking = () => {
     setSelectedBooking(null);
     setIsModalOpen(true);
   };
-
   const handleEditBooking = (booking) => {
     setSelectedBooking(booking);
     setIsModalOpen(true);
+  };
+  const handleCheckIn = (id) => {
+    changeStatus(id, "checked_in", "Guest checked in successfully!");
+  };
+  const handleCheckOut = (id) => {
+    changeStatus(id, "checked_out", "Guest checked out successfully!");
+  };
+  const handleCancel = (id) => {
+    changeStatus(id, "cancelled", "Booking cancelled successfully.");
+  };
+  const handleNoShow = (id) => {
+    changeStatus(id, "no_show", "Booking marked as no-show.");
   };
 
   const handleSuccess = () => {
@@ -110,6 +128,10 @@ export default function BookingsPage() {
                       key={booking.id}
                       booking={booking}
                       onEdit={() => handleEditBooking(booking)}
+                      onCheckIn={() => handleCheckIn(booking.id)}
+                      onCheckOut={() => handleCheckOut(booking.id)}
+                      onCancel={() => handleCancel(booking.id)}
+                      onNoShow={() => handleNoShow(booking.id)}
                     />
                   ))
                 ) : (

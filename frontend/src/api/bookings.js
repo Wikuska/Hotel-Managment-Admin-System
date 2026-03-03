@@ -13,7 +13,7 @@ export function createBooking(payload) {
 
 export function updateBooking(bookingId, payload) {
   return api(`/bookings/${bookingId}`, {
-    method: "PUT",
+    method: "PATCH",
     body: JSON.stringify(payload),
   });
 }
