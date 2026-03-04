@@ -100,7 +100,7 @@ export default function Step3Guests({
         <Button text="+ New Guest" onClick={() => setIsQuickAdd(true)} />
       </div>
 
-      <div className="mt-4 max-h-40 overflow-y-auto border border-zinc-200 rounded-xl">
+      <div className="mt-4 max-h-40 min-h-40 overflow-y-auto border border-zinc-200 rounded-xl">
         {(guests || [])
           .filter((g) =>
             `${g.first_name} ${g.last_name}`

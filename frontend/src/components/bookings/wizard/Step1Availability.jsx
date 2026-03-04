@@ -25,10 +25,11 @@ export default function Step1Availability({
 
   return (
     <div className="border-zinc-200 border-2 rounded-xl p-5">
-      <span className="text-2xl font-bold text-gray-900">
+      <span className="text-xl font-bold text-gray-900 block mb-4">
         Check Availability
       </span>
-      <div className="flex items-end w-full mt-5 gap-4">
+
+      <div className="flex flex-col gap-4">
         <ModalInput
           label="Arrival Date"
           input_type="date"
@@ -37,6 +38,7 @@ export default function Step1Availability({
           value={checkInDate}
           onChange={onCheckInChange}
         />
+
         <ModalInput
           label="Departure Date"
           input_type="date"
@@ -45,7 +47,8 @@ export default function Step1Availability({
           value={checkOutDate}
           onChange={onCheckOutChange}
         />
-        <div className="flex flex-col flex-1">
+
+        <div className="flex flex-col">
           <label htmlFor="guests_in_room" className={MODAL_LABEL_CLASS}>
             Number of guests
           </label>
@@ -63,12 +66,6 @@ export default function Step1Availability({
             ))}
           </select>
         </div>
-        <Button
-          text={isLoading ? "Loading..." : "Check availability"}
-          additional_style="h-11"
-          onClick={onCheckAvailability}
-          disabled={!canCheckAvailability || isLoading}
-        />
       </div>
     </div>
   );

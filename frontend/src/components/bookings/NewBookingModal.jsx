@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getRooms } from "../../api/rooms";
 import { getGuests } from "../../api/guests";
 import { createBooking } from "../../api/bookings";
@@ -22,7 +22,6 @@ const getTodayString = () => {
 };
 
 export default function NewBookingModal({ isOpen, onClose, onRefresh }) {
-  const [step, setStep] = useState(1);
   const [checkInDate, setCheckInDate] = useState(getTodayString());
   const [checkOutDate, setCheckOutDate] = useState("");
   const [numGuests, setNumGuests] = useState(1);
@@ -31,23 +30,24 @@ export default function NewBookingModal({ isOpen, onClose, onRefresh }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGuestId, setSelectedGuestId] = useState(null);
 
-  const [rooms, setRooms] = useState([]);
   const [availableRooms, setAvailableRooms] = useState([]);
   const [filteredRooms, setFilteredRooms] = useState([]);
   const [selectedConfig, setSelectedConfig] = useState("all");
   const [configurations, setConfigurations] = useState([]);
+
   const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
-  const [availabilityError, setAvailabilityError] = useState("");
 
   const { request: submitBooking, loading: isSubmitting } =
     useApi(createBooking);
 
-  const { data: guests = [], request: fetchGuestsList } = useApi(getGuests);
+  const { data: guests = [], request: fetchGuestsList } = useApi(getGuests, {
+    autoFetch: true,
+  });
 
   const handleCheckInChange = (event) => {
     const newDate = event.target.value;
     setCheckInDate(newDate);
-    setStep(1);
+    setChosenRoomId(null);
     if (checkOutDate && newDate > checkOutDate) {
       setCheckOutDate("");
     }
@@ -55,23 +55,21 @@ export default function NewBookingModal({ isOpen, onClose, onRefresh }) {
 
   const handleCheckOutChange = (event) => {
     setCheckOutDate(event.target.value);
-    setStep(1);
+    setChosenRoomId(null);
   };
 
   const handleGuestsChange = (event) => {
     setNumGuests(Number(event.target.value));
-    setStep(1);
+    setChosenRoomId(null);
   };
 
   const handleCheckAvailability = async () => {
     if (!checkInDate || !checkOutDate || checkInDate >= checkOutDate) return;
 
     setIsLoadingAvailability(true);
-    setAvailabilityError("");
 
     try {
       const allRooms = await getRooms();
-      setRooms(allRooms);
 
       const available = await getAvailableRooms(
         allRooms,
@@ -86,19 +84,24 @@ export default function NewBookingModal({ isOpen, onClose, onRefresh }) {
       setConfigurations(["all", ...configs]);
       setSelectedConfig("all");
       setFilteredRooms(available);
-
       setChosenRoomId(null);
       setSearchQuery("");
-      setStep(2);
     } catch (err) {
-      setAvailabilityError(
-        "Failed to fetch available rooms. Please try again.",
-      );
       console.error(err);
     } finally {
       setIsLoadingAvailability(false);
     }
   };
+
+  useEffect(() => {
+    if (checkInDate && checkOutDate && checkInDate < checkOutDate) {
+      handleCheckAvailability();
+    } else {
+      setAvailableRooms([]);
+      setFilteredRooms([]);
+      setChosenRoomId(null);
+    }
+  }, [checkInDate, checkOutDate, numGuests]);
 
   const handleConfigChange = (config) => {
     setSelectedConfig(config);
@@ -108,11 +111,6 @@ export default function NewBookingModal({ isOpen, onClose, onRefresh }) {
 
   const handleRoomSelect = (roomId) => {
     setChosenRoomId(roomId);
-    setStep(3);
-
-    if (!guests || guests.length === 0) {
-      fetchGuestsList();
-    }
   };
 
   const handleConfirmReservation = async () => {
@@ -138,48 +136,54 @@ export default function NewBookingModal({ isOpen, onClose, onRefresh }) {
       isOpen={isOpen}
       onClose={onClose}
       title="New Reservation"
-      maxWidth="max-w-5xl"
+      maxWidth="max-w-6xl"
     >
-      <Step1Availability
-        checkInDate={checkInDate}
-        checkOutDate={checkOutDate}
-        numGuests={numGuests}
-        isLoading={isLoadingAvailability}
-        onCheckInChange={handleCheckInChange}
-        onCheckOutChange={handleCheckOutChange}
-        onGuestsChange={handleGuestsChange}
-        onCheckAvailability={handleCheckAvailability}
-      />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="flex flex-col gap-6">
+          <Step1Availability
+            checkInDate={checkInDate}
+            checkOutDate={checkOutDate}
+            numGuests={numGuests}
+            isLoading={isLoadingAvailability}
+            onCheckInChange={handleCheckInChange}
+            onCheckOutChange={handleCheckOutChange}
+            onGuestsChange={handleGuestsChange}
+            onCheckAvailability={handleCheckAvailability}
+          />
 
-      {step >= 2 && (
-        <Step2Rooms
-          error={availabilityError}
-          configurations={configurations}
-          selectedConfig={selectedConfig}
-          filteredRooms={filteredRooms}
-          chosenRoomId={chosenRoomId}
-          isLoading={isLoadingAvailability}
-          onConfigChange={handleConfigChange}
-          onRoomSelect={handleRoomSelect}
-        />
-      )}
+          <Step3Guests
+            guests={guests}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            selectedGuestId={selectedGuestId}
+            setSelectedGuestId={setSelectedGuestId}
+            onGuestAdded={fetchGuestsList}
+          />
+        </div>
 
-      {step >= 3 && (
-        <Step3Guests
-          guests={guests}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          selectedGuestId={selectedGuestId}
-          setSelectedGuestId={setSelectedGuestId}
-          onGuestAdded={fetchGuestsList}
-        />
-      )}
+        <div className="relative border-2 border-zinc-200 rounded-xl bg-white overflow-hidden">
+          <div className="absolute inset-0 overflow-y-auto">
+            <Step2Rooms
+              configurations={configurations}
+              selectedConfig={selectedConfig}
+              filteredRooms={filteredRooms}
+              chosenRoomId={chosenRoomId}
+              isLoading={isLoadingAvailability}
+              onConfigChange={handleConfigChange}
+              onRoomSelect={handleRoomSelect}
+              hasValidDates={
+                checkInDate && checkOutDate && checkInDate < checkOutDate
+              }
+            />
+          </div>
+        </div>
+      </div>
 
-      <div className="flex justify-end gap-2 pt-5">
+      <div className="flex justify-end gap-2 pt-5 mt-4 border-t">
         <Button
           text={isSubmitting ? "Confirming..." : "Confirm Reservation"}
           onClick={handleConfirmReservation}
-          disabled={step < 3 || !selectedGuestId || isSubmitting}
+          disabled={!chosenRoomId || !selectedGuestId || isSubmitting}
         />
         <Button text="Cancel" onClick={onClose} disabled={isSubmitting} />
       </div>
