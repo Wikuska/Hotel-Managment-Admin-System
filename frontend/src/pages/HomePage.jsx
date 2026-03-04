@@ -22,9 +22,11 @@ export default function HomePage() {
 
   return (
     <main className="flex-1 flex flex-col w-full max-w-7xl mx-auto">
-      <div className="my-auto bg-zinc-300 shadow-lg rounded-xl p-8 border border-zinc-400">
+      <div className="my-auto bg-zinc-50/80 shadow-sm rounded-2xl p-8 border border-zinc-200/60 backdrop-blur-sm">
         <div className="flex justify-between">
-          <p className="text-4xl">Front Desk Overview</p>
+          <h1 className="text-4xl font-semibold text-zinc-800">
+            Front Desk Overview
+          </h1>
           <Button
             text="New Booking"
             onClick={() => setIsBookingModalOpen(true)}

@@ -40,7 +40,7 @@ export default function Step3Guests({
     return (
       <div className="border-blue-200 border-2 bg-blue-50/30 rounded-xl p-5 mt-4">
         {error && <Alert message={error} onClose={() => setError(null)} />}
-        <span className="text-xl font-bold text-gray-900">
+        <span className="text-xl font-bold text-gray-900 block mb-4">
           Quick Add New Guest
         </span>
         <form onSubmit={handleQuickSave}>
@@ -88,7 +88,9 @@ export default function Step3Guests({
 
   return (
     <div className="border-zinc-200 border-2 rounded-xl p-5 mt-4">
-      <span className="text-2xl font-bold text-gray-900">Select Guest</span>
+      <span className="text-xl font-bold text-gray-900 block mb-4">
+        Select Guest
+      </span>
       <div className="mt-5 flex gap-2">
         <input
           type="text"
