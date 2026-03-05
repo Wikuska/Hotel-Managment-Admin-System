@@ -107,38 +107,13 @@ export const BOOKING_STATUSES = [
 export const BOOKINGS_ACTIONS_BY_STATUS = {
   confirmed: {
     checkIn: true,
-    checkOut: false,
     cancel: true,
     noShow: true,
     edit: true,
   },
   checked_in: {
-    checkIn: false,
     checkOut: true,
-    cancel: false,
-    noShow: false,
     edit: true,
-  },
-  checked_out: {
-    checkIn: false,
-    checkOut: false,
-    cancel: false,
-    noShow: false,
-    edit: false,
-  },
-  cancelled: {
-    checkIn: false,
-    checkOut: false,
-    cancel: false,
-    noShow: false,
-    edit: false,
-  },
-  no_show: {
-    checkIn: false,
-    checkOut: false,
-    cancel: false,
-    noShow: false,
-    edit: false,
   },
 };
 
@@ -147,21 +122,17 @@ export const ROOMS_ACTIONS_BY_STATUS = {
     markDirty: true,
     startMaintenance: true,
     edit: true,
-    details: true,
   },
   occupied: {
     edit: true,
-    details: true,
   },
   dirty: {
     markClean: true,
     startMaintenance: true,
     edit: true,
-    details: true,
   },
   maintenance: {
     endMaintenance: true,
     edit: true,
-    details: true,
   },
 };

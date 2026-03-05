@@ -78,15 +78,6 @@ export default function RoomRow({ room, onEdit, onStatusChange }) {
               <NotebookPen size={20} />
             </Button>
           )}
-          {actions.details && (
-            <Button
-              variant="icon"
-              additional_style="hover:text-blue-600"
-              title="Room details"
-            >
-              <Info size={20} />
-            </Button>
-          )}
         </div>
       </td>
     </tr>
