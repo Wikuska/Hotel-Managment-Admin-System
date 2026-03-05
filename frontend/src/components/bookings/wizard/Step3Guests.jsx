@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createGuest } from "../../../api/guests";
 import { useApi } from "../../../hooks/useApi";
-import { Alert } from "../../UI/NotificationContext";
+import { Alert } from "../../ui/NotificationContext";
 import Button from "../../ui/Button";
 import ModalInput from "../../ui/ModalInput";
 

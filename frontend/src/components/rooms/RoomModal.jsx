@@ -9,7 +9,7 @@ import {
   MODAL_INPUT_CLASS,
   ROOM_STATUSES,
 } from "../../utils/constants";
-import { Alert } from "../UI/NotificationContext";
+import { Alert } from "../ui/NotificationContext";
 
 export default function RoomModal({ isOpen, onClose, onRefresh, initialData }) {
   const isEditMode = !!initialData;

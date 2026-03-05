@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { getBookings, updateBooking } from "../api/bookings";
-import { useNotification } from "../components/UI/NotificationContext";
+import { useNotification } from "../components/ui/NotificationContext";
 import { Loader2 } from "lucide-react";
 import { useApi } from "../hooks/useApi";
 import { filterByAllowedValues } from "../utils/dataUtils";

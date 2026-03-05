@@ -3,7 +3,7 @@ import RoomsPage from "./pages/RoomsPage";
 import GuestsPage from "./pages/GuestsPage";
 import Navbar from "./components/layout/Navbar";
 import BookingsPage from "./pages/BookingsPage";
-import { NotificationProvider } from "./components/UI/NotificationContext";
+import { NotificationProvider } from "./components/ui/NotificationContext";
 import { Routes, Route } from "react-router-dom";
 
 export default function App() {

@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { getApiError } from "../utils/errorHandler";
-import { useNotification } from "../components/UI/NotificationContext";
+import { useNotification } from "../components/ui/NotificationContext";
 
 export function useApi(apiFunc, { autoFetch = false, showToast = true } = {}) {
   const [data, setData] = useState(null);

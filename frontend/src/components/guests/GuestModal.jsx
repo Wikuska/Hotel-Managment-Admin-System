@@ -2,7 +2,7 @@ import ModalWrapper from "../ui/ModalWrapper";
 import Button from "../ui/Button";
 import ModalInput from "../ui/ModalInput";
 import { createGuest, updateGuest } from "../../api/guests";
-import { Alert } from "../UI/NotificationContext";
+import { Alert } from "../ui/NotificationContext";
 import { useApi } from "../../hooks/useApi";
 
 export default function GuestModal({

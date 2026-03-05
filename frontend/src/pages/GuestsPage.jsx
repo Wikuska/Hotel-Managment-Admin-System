@@ -2,7 +2,7 @@ import { useState } from "react";
 import { deleteGuest, getGuests } from "../api/guests";
 import { filterEntities, sortEntities } from "../utils/dataUtils";
 import { Loader2 } from "lucide-react";
-import { useNotification } from "../components/UI/NotificationContext";
+import { useNotification } from "../components/ui/NotificationContext";
 import { useApi } from "../hooks/useApi";
 import GuestRow from "../components/guests/GuestRow";
 import GuestModal from "../components/guests/GuestModal";

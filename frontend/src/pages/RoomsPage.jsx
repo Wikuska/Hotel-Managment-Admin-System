@@ -2,7 +2,7 @@ import { useState } from "react";
 import { getRooms, updateRoom } from "../api/rooms";
 import { sortEntities } from "../utils/dataUtils";
 import { useApi } from "../hooks/useApi";
-import { useNotification } from "../components/UI/NotificationContext";
+import { useNotification } from "../components/ui/NotificationContext";
 import { Loader2 } from "lucide-react";
 import RoomRow from "../components/rooms/RoomRow";
 import RoomModal from "../components/rooms/RoomModal";

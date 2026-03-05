@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { updateBooking } from "../../api/bookings";
 import { useApi } from "../../hooks/useApi";
-import { Alert } from "../UI/NotificationContext";
+import { Alert } from "../ui/NotificationContext";
 
 import ModalWrapper from "../ui/ModalWrapper";
 import Button from "../ui/Button";
