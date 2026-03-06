@@ -16,7 +16,7 @@ cd hotel-admin-system
 docker-compose up -d --build
 ```
 
-3. Access the System
+3. Access the System  
 Once the containers are running and the database is seeded, open your browser:
 ```bash
 Frontend UI: http://localhost:5173
