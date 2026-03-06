@@ -194,7 +194,7 @@ def get_dashboard_stats(db:Session):
     ).count()
     
     available_rooms_count = db.query(Room).filter(
-        Room.room_status == "available"
+        Room.room_status == ["available"]
     ).count()
     
     in_house = db.query(Booking).filter(

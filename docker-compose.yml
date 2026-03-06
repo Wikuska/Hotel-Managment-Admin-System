@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: pms_postgres
+    environment:
+      POSTGRES_USER: booking_user
+      POSTGRES_PASSWORD: booking_pass
+      POSTGRES_DB: booking
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  backend:
+    build: 
+      context: ./backend
+    container_name: pms_backend
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://booking_user:booking_pass@db:5432/booking
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  frontend:
+    build: 
+      context: ./frontend
+    container_name: pms_frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
