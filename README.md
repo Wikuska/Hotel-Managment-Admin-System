@@ -22,7 +22,7 @@ The system allows hotel staff to manage **rooms, guests and bookings**, includin
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/Wikuska/hotel-admin-system.git
+git clone https://github.com/Wikuska/Hotel-Managment-Admin-System.git
 cd hotel-admin-system
 ```
 
